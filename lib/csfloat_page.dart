@@ -1,8 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'http_service.dart';
-import 'post_model.dart';
+import 'csfloat_http_service.dart';
+import 'csfloat_trade_data.dart';
 
 class PostsPage extends StatelessWidget {
   final HttpService httpService = HttpService();

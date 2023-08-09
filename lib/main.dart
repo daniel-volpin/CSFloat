@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'posts.dart';
+import 'csfloat_page.dart';
 
 void main() {
   runApp(const MyApp());

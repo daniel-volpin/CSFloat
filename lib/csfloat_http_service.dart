@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'post_model.dart';
+import 'csfloat_trade_data.dart';
 import 'package:http/http.dart' as http;
 
 class HttpService {
