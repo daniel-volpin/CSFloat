@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'csfloat_http_service.dart';
@@ -9,28 +8,25 @@ class PostsPage extends StatelessWidget {
 
   PostsPage({Key? key}) : super(key: key);
 
-  Widget buildCsfloatCard(CSFloat csfloatData) {
+  Widget buildCSFloatCard(CSFloat csfloatData) {
     return Card(
       elevation: 2,
-      child: ListTile(
-        title: Column(
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Listing ID: ${csfloatData.itemID}"),
+            SelectableText("Listing ID: ${csfloatData.itemID}"),
+            const SizedBox(height: 4),
+            SelectableText("Seller Steam ID: ${csfloatData.sellerInfo!.steamID}"),
+            const SizedBox(height: 4),
+            SelectableText("Item Name: ${csfloatData.itemInfo.marketHashName}"),
             const SizedBox(height: 4),
             Text("Item price: ${csfloatData.price}"),
             const SizedBox(height: 4),
-            Text("Item Information: ${csfloatData.itemInfo.marketHashName}"),
-            if (csfloatData.sellerInfo!.steamID != null) ...[
-              const SizedBox(height: 4),
-              Text("Seller Steam ID: ${csfloatData.sellerInfo!.steamID}"),
-            ],
-            if (csfloatData.itemInfo.inspectLink != null &&
-                csfloatData.itemInfo.inspectLink is String &&
-                csfloatData.itemInfo.inspectLink.isNotEmpty) ...[
-              const SizedBox(height: 4),
-              buildInspectionLink(csfloatData.itemInfo.inspectLink),
-            ],
+            Container(
+              child: buildInspectionLink(csfloatData.itemInfo.inspectLink),
+            ),
           ],
         ),
       ),
@@ -38,22 +34,16 @@ class PostsPage extends StatelessWidget {
   }
 
   Widget buildInspectionLink(String inspectLink) {
-    return RichText(
-      text: TextSpan(
-        children: [
-          const TextSpan(text: "Inspection URL: "),
-          TextSpan(
-            text: inspectLink,
-            style: const TextStyle(
-              color: Colors.blue,
-              decoration: TextDecoration.underline,
-            ),
-            recognizer: TapGestureRecognizer()
-              ..onTap = () {
-                launchUrl(Uri.parse(inspectLink));
-              },
-          ),
-        ],
+    return GestureDetector(
+      onTap: () {
+        launchUrl(Uri.parse(inspectLink));
+      },
+      child: const Text(
+        "Inspect Item",
+        style: TextStyle(
+          color: Colors.blue,
+          decoration: TextDecoration.underline,
+        ),
       ),
     );
   }
@@ -73,13 +63,17 @@ class PostsPage extends StatelessWidget {
             return Text('Error: ${snapshot.error}');
           } else if (snapshot.hasData) {
             final csfloatData = snapshot.data!;
-            return ListView(
-              children: csfloatData.map<Widget>((CSFloat csfloat) {
+            return GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+              ),
+              itemCount: csfloatData.length,
+              itemBuilder: (context, index) {
                 return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                  child: buildCsfloatCard(csfloat),
+                  padding: const EdgeInsets.all(8.0),
+                  child: buildCSFloatCard(csfloatData[index]),
                 );
-              }).toList(),
+              },
             );
           } else {
             return const Center(child: CircularProgressIndicator());
