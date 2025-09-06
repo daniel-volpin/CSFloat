@@ -53,10 +53,14 @@ with st.expander("Ask AI about current listings", expanded=False):
     )
     if st.button("Analyze Listings with AI"):
         if not items:
-            st.warning("No listings loaded yet. Adjust filters and load listings first.")
+            st.warning(
+                "No listings loaded yet. Adjust filters and load listings first."
+            )
         elif not q.strip():
             st.info("Enter a question to analyze the current listings.")
         else:
             with st.spinner("Thinking with AI..."):
-                answer = ask_about_listings(q.strip(), items, model=custom_model, max_items=max_items)
+                answer = ask_about_listings(
+                    q.strip(), items, model=custom_model, max_items=max_items
+                )
             st.markdown(answer)

@@ -12,7 +12,9 @@ def _build_listings_digest(items: List[ItemDTO], max_items: int = 50) -> str:
         rarity = it.rarity or "N/A"
         fl = f"{it.float_value:.6f}" if it.float_value is not None else "N/A"
         name = it.name or "Unknown"
-        lines.append(f"{i}. {name} | {price_str} | wear={wear} | rarity={rarity} | float={fl}")
+        lines.append(
+            f"{i}. {name} | {price_str} | wear={wear} | rarity={rarity} | float={fl}"
+        )
     return "\n".join(lines)
 
 
@@ -30,6 +32,7 @@ def _make_client() -> OpenAI:
     # Guard against outdated httpx causing 'proxies' TypeError
     try:
         import httpx  # type: ignore
+
         ver = getattr(httpx, "__version__", "0.0.0")
         parts = ver.split(".")
         major = int(parts[0]) if len(parts) > 0 and parts[0].isdigit() else 0
@@ -70,11 +73,7 @@ def ask_about_listings(
     client = _make_client()
 
     # Choose model priority: explicit arg → OPENAI_MODEL → sensible default
-    chosen_model = (
-        model
-        or os.getenv("OPENAI_MODEL")
-        or "gpt-4o-mini"
-    )
+    chosen_model = model or os.getenv("OPENAI_MODEL") or "gpt-4o-mini"
 
     digest = _build_listings_digest(items, max_items=max_items)
 
