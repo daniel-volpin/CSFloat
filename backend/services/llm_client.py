@@ -1,6 +1,6 @@
+import logging
 import os
 from typing import List, Optional
-import logging
 
 from ..models.models import ItemDTO
 from .openai_client import OpenAIClient
