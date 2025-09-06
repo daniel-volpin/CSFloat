@@ -21,3 +21,6 @@ pretty = true
 show_error_codes = true
 warn_unused_ignores = true
 exclude = '(\.venv|venv|build|dist|\.git|__pycache__)'
+
+[tool.ruff]
+line-length = 100
