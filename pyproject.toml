@@ -21,6 +21,7 @@ pretty = true
 show_error_codes = true
 warn_unused_ignores = true
 exclude = '(\.venv|venv|build|dist|\.git|__pycache__)'
+explicit_package_bases = true
 
 [tool.ruff]
 line-length = 100
