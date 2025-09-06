@@ -4,10 +4,12 @@
 ## Quick Start
 
 ### Prerequisites
+
 - Python 3.10+ recommended
 - CSFloat API key
 
 ### Backend Setup
+
 ```bash
 cd backend
 python -m venv .venv && source .venv/bin/activate
@@ -23,6 +25,7 @@ uvicorn backend.main:app --reload
 ```
 
 ### Frontend Setup
+
 ```bash
 cd frontend
 python -m venv .venv && source .venv/bin/activate
@@ -37,5 +40,6 @@ streamlit run app.py
 ```
 
 ### Notes
+
 - Do not commit API keys or secrets.
 - Backend must be running before starting the frontend.
