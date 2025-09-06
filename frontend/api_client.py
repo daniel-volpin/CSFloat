@@ -15,6 +15,7 @@ def fetch_listings(params):
         data = response.json()
         if not isinstance(data, dict) or "data" not in data:
             import streamlit as st
+
             st.error(f"Unexpected response from backend: {data}")
             return []
         listings = []
@@ -46,9 +47,13 @@ def fetch_listings(params):
             503: "Service Unavailable: Maintenance in progress.",
         }
         import streamlit as st
-        st.error(error_map.get(code if code is not None else -1, f"Unexpected error: {code}"))
+
+        st.error(
+            error_map.get(code if code is not None else -1, f"Unexpected error: {code}")
+        )
         return []
     except Exception as e:
         import streamlit as st
+
         st.error(f"Unexpected error: {e}")
         return []

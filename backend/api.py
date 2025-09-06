@@ -1,12 +1,13 @@
-from fastapi import APIRouter, Query, HTTPException
-import requests
-router = APIRouter()
-from models import ListingQueryParams
-from utils import get_api_key, logger
-
-
 import time
+from models import ListingQueryParams
 from typing import Dict, Tuple, Any
+from fastapi import APIRouter, Query, HTTPException
+from utils import get_api_key, logger
+import requests
+
+router = APIRouter()
+
+
 LISTINGS_CACHE: Dict[Tuple[Tuple[str, Any], ...], Dict[str, Any]] = {}
 CACHE_TTL = 300  # seconds (5 minutes)
 
@@ -69,9 +70,9 @@ def get_listings(
     now = time.time()
     # Check cache
     cached = LISTINGS_CACHE.get(cache_key)
-    if cached and now - cached['timestamp'] < CACHE_TTL:
+    if cached and now - cached["timestamp"] < CACHE_TTL:
         print(f"[CACHE] Returning cached result for params: {query_params}")
-        return cached['result']
+        return cached["result"]
 
     url = "https://csfloat.com/api/v1/listings"
     headers = {"Authorization": get_api_key()}

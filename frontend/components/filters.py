@@ -24,12 +24,17 @@ def filter_sidebar():
         rarity = st.multiselect("Rarity", RARITY_OPTIONS)
     with st.sidebar.expander("Item Details", expanded=False):
         paint_seed_input = st.text_input("Paint Seed (comma separated)", "")
-        paint_seeds = [int(x.strip()) for x in paint_seed_input.split(",") if x.strip().isdigit()] if paint_seed_input else None
+        paint_seeds = (
+            [int(x.strip()) for x in paint_seed_input.split(",") if x.strip().isdigit()]
+            if paint_seed_input
+            else None
+        )
         paint_index = st.text_input("Paint Index", "")
         user_id = st.text_input("User ID", "")
         collection = st.text_input("Collection", "")
         # Fetch available item names from API
         from api_client import fetch_listings
+
         @st.cache_data(show_spinner=False)
         def get_item_names():
             params = {"limit": 50}
@@ -44,8 +49,13 @@ def filter_sidebar():
                     continue
                 clean_params[k] = v
             items = fetch_listings(clean_params)
-            names = sorted(set([item.name for item in items if hasattr(item, "name") and item.name]))
+            names = sorted(
+                set(
+                    [item.name for item in items if hasattr(item, "name") and item.name]
+                )
+            )
             return names
+
         item_names = get_item_names()
     item_name = st.selectbox("Item Name", ["Any"] + item_names, index=0)
     market_hash_name = st.text_input("Market Hash Name (manual search)", "")
@@ -80,8 +90,8 @@ def filter_sidebar():
         "collection": collection or None,
         "min_price": int(min_price_dollars * 100) if min_price_dollars else None,
         "max_price": int(max_price_dollars * 100) if max_price_dollars else None,
-    "item_name": None if item_name == "Any" else item_name,
-    "market_hash_name": market_hash_name or None,
+        "item_name": None if item_name == "Any" else item_name,
+        "market_hash_name": market_hash_name or None,
         "type": type_ or None,
         "stickers": stickers or None,
     }
