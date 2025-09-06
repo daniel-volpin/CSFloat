@@ -1,0 +1,23 @@
+name: Update PR branches on base changes
+
+on:
+  push:
+    branches: [ main, master ]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-prs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update open PR branches with latest base
+        uses: peter-evans/update-branch@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target-branch: ${{ github.ref_name }}
+          # Optional filters:
+          # exclude-drafts: true
+          # labels: auto-update
+          # exclude-labels: no-auto-update
