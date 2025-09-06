@@ -1,0 +1,37 @@
+# config.py - Centralized configuration for frontend
+
+
+API_BASE_URL = "http://localhost:8000"
+LISTINGS_ENDPOINT = f"{API_BASE_URL}/api/listings"
+
+# UI settings
+APP_TITLE = "CSFloat Listings"
+APP_SUBTITLE = "Find and filter your favorite items"
+
+# Filter defaults
+DEFAULT_LIMIT = 10
+DEFAULT_FLOAT_RANGE = (0.0, 1.0)
+RARITY_OPTIONS = [
+    "",
+    "Common",
+    "Uncommon",
+    "Rare",
+    "Mythical",
+    "Legendary",
+    "Ancient",
+    "Immortal",
+]
+CATEGORY_OPTIONS = ["Any", "Normal", "StatTrak", "Souvenir"]
+CATEGORY_MAP = {"Any": 0, "Normal": 1, "StatTrak": 2, "Souvenir": 3}
+SORT_OPTIONS = [
+    "lowest_price",
+    "highest_price",
+    "most_recent",
+    "expires_soon",
+    "lowest_float",
+    "highest_float",
+    "best_deal",
+    "highest_discount",
+    "float_rank",
+    "num_bids",
+]

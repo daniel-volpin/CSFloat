@@ -13,6 +13,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
 def get_api_key():
     if not API_KEY:
         logger.error("CSFLOAT_API_KEY not set in environment.")

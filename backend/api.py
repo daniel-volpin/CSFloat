@@ -7,14 +7,16 @@ router = APIRouter()
 
 # Helper to build query params dict
 
+
 def build_query_params(params: ListingQueryParams):
     query = {}
     for key, value in params.dict(exclude_none=True).items():
         if isinstance(value, list):
-            query[key] = ','.join(map(str, value))
+            query[key] = ",".join(map(str, value))
         else:
             query[key] = value
     return query
+
 
 @router.get("/listings")
 def get_listings(
@@ -34,7 +36,7 @@ def get_listings(
     max_price: int = Query(None),
     market_hash_name: str = Query(None),
     type: str = Query(None),
-    stickers: str = Query(None)
+    stickers: str = Query(None),
 ):
     params = ListingQueryParams(
         cursor=cursor,
@@ -53,7 +55,7 @@ def get_listings(
         max_price=max_price,
         market_hash_name=market_hash_name,
         type=type,
-        stickers=stickers
+        stickers=stickers,
     )
     url = "https://csfloat.com/api/v1/listings"
     headers = {"Authorization": get_api_key()}
@@ -70,4 +72,6 @@ def get_listings(
             return []
     except requests.RequestException as e:
         logger.error(f"Error fetching listings: {e}")
-        raise HTTPException(status_code=502, detail="Failed to fetch listings from CSFloat API.")
+        raise HTTPException(
+            status_code=502, detail="Failed to fetch listings from CSFloat API."
+        )

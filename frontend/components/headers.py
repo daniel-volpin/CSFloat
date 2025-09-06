@@ -2,6 +2,7 @@ import streamlit as st
 
 from typing import Optional
 
+
 def custom_header(title: str, subtitle: Optional[str] = None):
     st.title(title)
     if subtitle:

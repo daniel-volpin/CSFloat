@@ -1,12 +1,12 @@
-
-
 import streamlit as st
 from api_client import fetch_listings
 from components.item_display import display_item
 from components.filters import filter_sidebar
 from components.headers import custom_header
+from config import APP_TITLE, APP_SUBTITLE
 
-custom_header("CSFloat Listings", subtitle="Find and filter your favorite items")
+
+custom_header(APP_TITLE, subtitle=APP_SUBTITLE)
 
 # Get filter params from sidebar
 params = filter_sidebar()

@@ -1,20 +1,27 @@
 import streamlit as st
+from config import (
+    DEFAULT_LIMIT,
+    DEFAULT_FLOAT_RANGE,
+    RARITY_OPTIONS,
+    CATEGORY_OPTIONS,
+    CATEGORY_MAP,
+    SORT_OPTIONS,
+)
+
 
 def filter_sidebar():
     st.sidebar.header("Filter Listings")
     with st.sidebar.expander("Basic Filters", expanded=True):
         cursor = st.text_input("Cursor", "")
-        limit = st.slider("Limit", 1, 50, 10)
-        sort_by = st.selectbox("Sort By", [
-            "lowest_price", "highest_price", "most_recent", "expires_soon", "lowest_float", "highest_float", "best_deal", "highest_discount", "float_rank", "num_bids"
-        ], index=6)
-        category = st.selectbox("Category", ["Any", "Normal", "StatTrak", "Souvenir"], index=0)
-        category_map = {"Any": 0, "Normal": 1, "StatTrak": 2, "Souvenir": 3}
+        limit = st.slider("Limit", 1, 50, DEFAULT_LIMIT)
+        sort_by = st.selectbox("Sort By", SORT_OPTIONS, index=6)
+        category = st.selectbox("Category", CATEGORY_OPTIONS, index=0)
         def_index = st.text_input("Def Index (comma separated)", "")
     with st.sidebar.expander("Float & Rarity", expanded=False):
-        min_float, max_float = st.slider("Float Range", 0.0, 1.0, (0.0, 1.0), step=0.01)
-        rarity_options = ["", "Common", "Uncommon", "Rare", "Mythical", "Legendary", "Ancient", "Immortal"]
-        rarity = st.multiselect("Rarity", rarity_options)
+        min_float, max_float = st.slider(
+            "Float Range", 0.0, 1.0, DEFAULT_FLOAT_RANGE, step=0.01
+        )
+        rarity = st.multiselect("Rarity", RARITY_OPTIONS)
     with st.sidebar.expander("Item Details", expanded=False):
         paint_seed = st.text_input("Paint Seed", "")
         paint_index = st.text_input("Paint Index", "")
@@ -25,16 +32,24 @@ def filter_sidebar():
         stickers = st.text_input("Stickers", "")
     with st.sidebar.expander("Price Filter", expanded=True):
         col1, col2 = st.columns(2)
-        min_price_dollars = col1.number_input("Min Price ($)", min_value=0.0, value=0.0, step=0.01)
-        max_price_dollars = col2.number_input("Max Price ($)", min_value=0.0, value=0.0, step=0.01)
+        min_price_dollars = col1.number_input(
+            "Min Price ($)", min_value=0.0, value=0.0, step=0.01
+        )
+        max_price_dollars = col2.number_input(
+            "Max Price ($)", min_value=0.0, value=0.0, step=0.01
+        )
     # ...existing code...
     # If you need ItemDTO or other models, use: from models import ItemDTO
     params = {
         "cursor": cursor or None,
         "limit": limit,
         "sort_by": sort_by,
-        "category": category_map[category],
-        "def_index": [int(x) for x in def_index.split(",") if x.strip().isdigit()] if def_index else None,
+        "category": CATEGORY_MAP[category],
+        "def_index": (
+            [int(x) for x in def_index.split(",") if x.strip().isdigit()]
+            if def_index
+            else None
+        ),
         "min_float": min_float,
         "max_float": max_float,
         "rarity": ",".join(rarity) if rarity else None,
