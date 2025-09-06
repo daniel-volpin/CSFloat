@@ -3,8 +3,6 @@ from openai import OpenAI
 from typing import Optional
 from ..core.utils import OPENAI_API_KEY
 
-print("DEBUG: OPENAI_API_KEY loaded:", OPENAI_API_KEY)
-
 
 class OpenAIClient:
     """
