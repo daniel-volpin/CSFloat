@@ -36,9 +36,7 @@ def listing_analysis(items: Optional[List], default_model: Optional[str] = None)
         help="Click to get AI-powered insights based on your question and current listings.",
     ):
         if not items:
-            st.warning(
-                "No listings loaded yet. Adjust filters and load listings first."
-            )
+            st.warning("No listings loaded yet. Adjust filters and load listings first.")
         elif not q.strip():
             st.info("Enter a question to analyze the current listings.")
         else:

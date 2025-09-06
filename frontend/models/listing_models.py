@@ -27,6 +27,4 @@ class ItemDTO(BaseModel):
             }
             rarity = rarity_map.get(rarity, str(rarity))
         float_value = data.get("float_value")
-        return cls(
-            name=name, price=price, wear=wear, rarity=rarity, float_value=float_value
-        )
+        return cls(name=name, price=price, wear=wear, rarity=rarity, float_value=float_value)

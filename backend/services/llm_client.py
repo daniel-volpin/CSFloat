@@ -12,9 +12,7 @@ def _build_listings_digest(items: List[ItemDTO], max_items: int = 50) -> str:
         rarity = it.rarity or "N/A"
         fl = f"{it.float_value:.6f}" if it.float_value is not None else "N/A"
         name = it.name or "Unknown"
-        lines.append(
-            f"{i}. {name} | {price_str} | wear={wear} | rarity={rarity} | float={fl}"
-        )
+        lines.append(f"{i}. {name} | {price_str} | wear={wear} | rarity={rarity} | float={fl}")
     return "\n".join(lines)
 
 
@@ -50,9 +48,7 @@ def ask_about_listings(
         {"role": "user", "content": user},
     ]
     try:
-        resp = client.chat(
-            model=chosen_model, messages=messages, temperature=0.2, max_tokens=300
-        )
+        resp = client.chat(model=chosen_model, messages=messages, temperature=0.2, max_tokens=300)
         return resp
     except Exception as e:
         return f"LLM request failed: {str(e)}"

@@ -44,9 +44,7 @@ def _map_http_error(status: int, payload: Dict[str, Any] | None) -> ApiClientErr
         504: "Gateway timeout. Please try again later.",
     }
     base = messages.get(status, f"HTTP {status} error.")
-    user_message = (
-        server_msg if isinstance(server_msg, str) and server_msg.strip() else base
-    )
+    user_message = server_msg if isinstance(server_msg, str) and server_msg.strip() else base
     return ApiClientError(
         user_message, status_code=status, detail=str(server_msg) if server_msg else None
     )
@@ -60,9 +58,7 @@ def _request_json(
     json: Any | None = None,
 ) -> Dict[str, Any]:
     try:
-        resp = requests.request(
-            method, url, params=params, json=json, timeout=DEFAULT_TIMEOUT
-        )
+        resp = requests.request(method, url, params=params, json=json, timeout=DEFAULT_TIMEOUT)
         # Attempt to parse JSON payload early for richer errors
         payload: Dict[str, Any] | None = None
         try:
@@ -79,9 +75,7 @@ def _request_json(
     except requests.Timeout:
         raise ApiClientError("Request timed out. Please try again.")
     except requests.ConnectionError:
-        raise ApiClientError(
-            "Cannot reach backend. Verify the server is running and reachable."
-        )
+        raise ApiClientError("Cannot reach backend. Verify the server is running and reachable.")
     except requests.RequestException as e:
         raise ApiClientError("Network error occurred. Please try again.", detail=str(e))
 
@@ -102,9 +96,7 @@ def fetch_listings(params: Dict[str, Any]) -> List[ItemDTO]:
     if not isinstance(items_raw, list):
         raise ApiClientError("Unexpected listings payload from server.")
 
-    listings = [
-        ItemDTO.from_dict(_merge_item(e)) for e in items_raw if isinstance(e, dict)
-    ]
+    listings = [ItemDTO.from_dict(_merge_item(e)) for e in items_raw if isinstance(e, dict)]
 
     elapsed = time.time() - start
     if elapsed < 0.1:

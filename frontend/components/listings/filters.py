@@ -18,9 +18,7 @@ def filter_sidebar():
         category = st.selectbox("Category", CATEGORY_OPTIONS, index=0)
         def_index = st.text_input("Def Index (comma separated)", "")
     with st.sidebar.expander("Float & Rarity", expanded=False):
-        min_float, max_float = st.slider(
-            "Float Range", 0.0, 1.0, DEFAULT_FLOAT_RANGE, step=0.01
-        )
+        min_float, max_float = st.slider("Float Range", 0.0, 1.0, DEFAULT_FLOAT_RANGE, step=0.01)
         rarity = st.multiselect("Rarity", RARITY_OPTIONS)
     with st.sidebar.expander("Item Details", expanded=False):
         paint_seed_input = st.text_input("Paint Seed (comma separated)", "")
@@ -46,12 +44,8 @@ def filter_sidebar():
     stickers = st.text_input("Stickers", "")
     with st.sidebar.expander("Price Filter", expanded=True):
         col1, col2 = st.columns(2)
-        min_price_dollars = col1.number_input(
-            "Min Price ($)", min_value=0.0, value=0.0, step=0.01
-        )
-        max_price_dollars = col2.number_input(
-            "Max Price ($)", min_value=0.0, value=0.0, step=0.01
-        )
+        min_price_dollars = col1.number_input("Min Price ($)", min_value=0.0, value=0.0, step=0.01)
+        max_price_dollars = col2.number_input("Max Price ($)", min_value=0.0, value=0.0, step=0.01)
     # ...existing code...
     # If you need ItemDTO or other models, use: from models import ItemDTO
     params = {
@@ -60,9 +54,7 @@ def filter_sidebar():
         "sort_by": sort_by,
         "category": CATEGORY_MAP[category],
         "def_index": (
-            [int(x) for x in def_index.split(",") if x.strip().isdigit()]
-            if def_index
-            else None
+            [int(x) for x in def_index.split(",") if x.strip().isdigit()] if def_index else None
         ),
         "min_float": min_float,
         "max_float": max_float,

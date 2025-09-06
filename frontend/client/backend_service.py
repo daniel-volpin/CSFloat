@@ -20,9 +20,7 @@ def _request_json(
     json: Any | None = None,
 ) -> Dict[str, Any]:
     try:
-        resp = requests.request(
-            method, url, params=params, json=json, timeout=DEFAULT_TIMEOUT
-        )
+        resp = requests.request(method, url, params=params, json=json, timeout=DEFAULT_TIMEOUT)
         try:
             payload = resp.json()
         except Exception:
@@ -65,9 +63,7 @@ class BackendClient:
         model: Optional[str] = None,
         max_items: int = 50,
     ) -> str:
-        serializable_items = [
-            item.dict() if hasattr(item, "dict") else item for item in items
-        ]
+        serializable_items = [item.dict() if hasattr(item, "dict") else item for item in items]
         payload = {
             "question": question,
             "items": serializable_items,
