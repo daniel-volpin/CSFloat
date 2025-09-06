@@ -1,3 +1,13 @@
+# VS Code
+.vscode/
+*.code-workspace
+
+# Streamlit
+frontend/.streamlit/
+
+# Ignore secrets
+backend/.env
+frontend/.env
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
