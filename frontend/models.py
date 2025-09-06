@@ -1,20 +1,18 @@
-# models.py - Data models for frontend
+from pydantic import BaseModel, validator
+from typing import Optional, Any
 
-class ItemDTO:
-    def __init__(self, name, price, wear, rarity, float_value):
-        self.name = name
-        self.price = price
-        self.wear = wear
-        self.rarity = rarity
-        self.float_value = float_value
+class ItemDTO(BaseModel):
+    name: Optional[str]
+    price: Optional[int]
+    wear: Optional[str]
+    rarity: Optional[str]
+    float_value: Optional[float]
 
     @classmethod
-    def from_dict(cls, data):
-        # Map fields from merged dict
+    def from_dict(cls, data: dict[str, Any]) -> "ItemDTO":
         name = data.get('item_name') or data.get('name')
         price = data.get('price')
         wear = data.get('wear_name') or data.get('wear')
-        # Rarity: prefer string, fallback to int
         rarity = data.get('rarity')
         if isinstance(rarity, int):
             rarity_map = {
@@ -22,4 +20,10 @@ class ItemDTO:
             }
             rarity = rarity_map.get(rarity, str(rarity))
         float_value = data.get('float_value')
-        return cls(name, price, wear, rarity, float_value)
+        return cls(
+            name=name,
+            price=price,
+            wear=wear,
+            rarity=rarity,
+            float_value=float_value
+        )

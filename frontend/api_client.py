@@ -1,8 +1,12 @@
-# api_client.py - API interaction logic for frontend
 import requests
+import streamlit as st
 from models import ItemDTO
 
+import time
+
+@st.cache_data(show_spinner=False)
 def fetch_listings(params):
+    start = time.time()
     response = requests.get("http://localhost:8000/api/listings", params=params)
     response.raise_for_status()
     data = response.json()
@@ -13,4 +17,9 @@ def fetch_listings(params):
             merged.update(entry['item'])
         merged.update({k: v for k, v in entry.items() if k != 'item'})
         listings.append(ItemDTO.from_dict(merged))
+    elapsed = time.time() - start
+    if elapsed < 0.1:
+        print("[Cache] Using cached listings!")
+    else:
+        print(f"[Cache] Fetching listings from API... ({elapsed:.2f}s)")
     return listings
