@@ -1,0 +1,15 @@
+feature:
+  - '^feat(\(|:).*'
+enhancement:
+  - '^feat(\(|:).*'
+bug:
+  - '^fix(\(|:).*'
+docs:
+  - '^docs(\(|:).*'
+chore:
+  - '^chore(\(|:).*'
+refactor:
+  - '^refactor(\(|:).*'
+ci:
+  - '^ci(\(|:).*'
+

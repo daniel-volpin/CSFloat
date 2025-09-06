@@ -1,0 +1,21 @@
+backend:
+  - backend/**
+
+frontend:
+  - frontend/**
+
+ci:
+  - .github/**
+  - pyproject.toml
+  - .pre-commit-config.yaml
+  - .editorconfig
+  - .flake8
+
+docs:
+  - '**/*.md'
+
+dependencies:
+  - '**/requirements.txt'
+  - '**/environment.yml'
+  - .github/dependabot.yml
+
