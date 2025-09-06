@@ -1,5 +1,5 @@
 import streamlit as st
-from models import ItemDTO
+from frontend.models.listing_models import ItemDTO
 
 ITEM_FIELDS = {
     "price": "Price",

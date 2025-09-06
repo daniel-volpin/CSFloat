@@ -69,11 +69,11 @@ streamlit run app.py
 - Frontend
   - `API_BASE_URL` (optional): Defaults to `http://localhost:8000`.
   - AI:
-    - OpenAI: `OPENAI_API_KEY` and optional `OPENAI_MODEL` (e.g., `gpt-4o`).
+    - OpenAI: `OPENAI_API_KEY` and optional `OPENAI_MODEL` (e.g., `gpt-5-nano`).
     - Optional: `OPENAI_BASE_URL` if proxying/self-hosting.
 
 Use OpenAI directly
-- Set `OPENAI_API_KEY` (and optionally `OPENAI_MODEL`, default is `gpt-4o`).
+- Set `OPENAI_API_KEY` (and optionally `OPENAI_MODEL`, default is `gpt-5-nano`). If this model is not available to your account, use `gpt-4o-mini`.
 
 Important: Do not commit API keys or secrets. Keep `.env` files private.
 Tip (conda): To update envs after changing requirements, run `conda env update -f environment.yml` in each folder.
@@ -104,6 +104,7 @@ This feature lets you ask an LLM about the listings already loaded in the UI (no
 Notes
 - The app sends a concise digest per item: index, name, price, wear, rarity, float; you can control how many items are included.
 - The model will recommend items by index/name with a short rationale; it does not fetch external prices.
+ - Responses are capped at ~300 tokens to control costs.
 
 ## Troubleshooting
 - 401 Unauthorized (backend): Verify `CSFLOAT_API_KEY`.

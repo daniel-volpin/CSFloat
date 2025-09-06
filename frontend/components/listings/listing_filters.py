@@ -1,5 +1,5 @@
 import streamlit as st
-from config import (
+from frontend.config.settings import (
     DEFAULT_LIMIT,
     DEFAULT_FLOAT_RANGE,
     RARITY_OPTIONS,
@@ -32,15 +32,14 @@ def filter_sidebar():
         paint_index = st.text_input("Paint Index", "")
         user_id = st.text_input("User ID", "")
         collection = st.text_input("Collection", "")
-        # Fetch available item names from lightweight endpoint
-        from api_client import fetch_item_names
+        from frontend.client.csfloat_api import fetch_item_names
 
         @st.cache_data(show_spinner=False, ttl=60)
         def get_item_names():
             return fetch_item_names(limit=50)
 
         item_names = get_item_names()
-    item_name = st.selectbox("Item Name", ["Any"] + item_names, index=0)
+        item_name = st.selectbox("Item Name", ["Any"] + item_names, index=0)
     market_hash_name = st.text_input("Market Hash Name (manual search)", "")
     type_ = st.selectbox("Type", ["", "buy_now", "auction"], index=0)
     stickers = st.text_input("Stickers", "")
@@ -52,8 +51,6 @@ def filter_sidebar():
         max_price_dollars = col2.number_input(
             "Max Price ($)", min_value=0.0, value=0.0, step=0.01
         )
-    # ...existing code...
-    # If you need ItemDTO or other models, use: from models import ItemDTO
     params = {
         "cursor": cursor or None,
         "limit": limit,

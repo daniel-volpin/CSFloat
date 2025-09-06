@@ -11,9 +11,6 @@ class ItemDTO(BaseModel):
 
 
 def item_to_dto(item):
-    """
-    Converts an item dict or object to ItemDTO, extracting only relevant fields.
-    """
     if isinstance(item, dict):
         return ItemDTO(
             name=item.get("name"),
