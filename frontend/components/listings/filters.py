@@ -1,5 +1,5 @@
 import streamlit as st
-from frontend.config.settings import (
+from config.settings import (
     DEFAULT_LIMIT,
     DEFAULT_FLOAT_RANGE,
     RARITY_OPTIONS,

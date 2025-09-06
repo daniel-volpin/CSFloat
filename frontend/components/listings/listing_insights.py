@@ -1,6 +1,6 @@
 import streamlit as st
 from typing import List, Optional
-from client.backend_client import BackendClient
+from client.backend_service import BackendClient, BackendApiError
 
 
 def listing_analysis(items: Optional[List], default_model: Optional[str] = None):
@@ -50,5 +50,7 @@ def listing_analysis(items: Optional[List], default_model: Optional[str] = None)
                     )
                     st.success("AI analysis complete!")
                     st.markdown(answer)
-                except Exception as e:
-                    st.error(f"Failed to get AI analysis: {str(e)}")
+                except BackendApiError as e:
+                    st.error(e.args[0])
+                except Exception:
+                    st.error("Failed to get AI analysis. Please try again.")

@@ -1,4 +1,7 @@
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from .api import router
 
@@ -13,3 +16,27 @@ app.add_middleware(
 )
 
 app.include_router(router, prefix="/api")
+
+
+# Consistent error JSON across the API
+@app.exception_handler(HTTPException)
+async def http_exception_handler(_, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "error": "http_error",
+            "message": exc.detail if isinstance(exc.detail, str) else str(exc.detail),
+        },
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(_, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=422,
+        content={
+            "error": "validation_error",
+            "message": "Invalid request parameters.",
+            "details": exc.errors(),
+        },
+    )

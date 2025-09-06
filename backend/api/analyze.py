@@ -1,3 +1,4 @@
+import os
 from fastapi import APIRouter, HTTPException, Body, Query
 from ..services.llm_client import ask_about_listings
 from ..models.models import ItemDTO
@@ -5,10 +6,13 @@ from typing import List, Optional
 
 router = APIRouter()
 
+USE_DUMMY_DATA = os.getenv("USE_DUMMY_DATA", "false").lower() in ("1", "true", "yes")
 
 @router.get("/item-names")
 def fetch_item_names_endpoint(limit: int = 50):
-    # TODO: Replace with real data source
+    # In production, disable dummy responses and return 503
+    if not USE_DUMMY_DATA:
+        raise HTTPException(status_code=503, detail="Item names service unavailable.")
     sample_names = ["Sample Item", "Another Item", "Cool Skin", "Rare Collectible"]
     return {"names": sample_names[:limit]}
 
@@ -21,7 +25,9 @@ def get_listings(
     min_float: float = Query(0.0),
     max_float: float = Query(1.0),
 ):
-    # TODO: Replace with real data source
+    # In production, disable dummy responses and return 503
+    if not USE_DUMMY_DATA:
+        raise HTTPException(status_code=503, detail="Listings service unavailable.")
     sample_items = [
         ItemDTO(
             name="Sample Item",

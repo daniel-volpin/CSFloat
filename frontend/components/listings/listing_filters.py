@@ -1,5 +1,5 @@
 import streamlit as st
-from frontend.config.settings import (
+from config.settings import (
     DEFAULT_LIMIT,
     DEFAULT_FLOAT_RANGE,
     RARITY_OPTIONS,
@@ -32,7 +32,7 @@ def filter_sidebar():
         paint_index = st.text_input("Paint Index", "")
         user_id = st.text_input("User ID", "")
         collection = st.text_input("Collection", "")
-        from frontend.client.csfloat_api import fetch_item_names
+        from client.csfloat_api import fetch_item_names
 
         @st.cache_data(show_spinner=False, ttl=60)
         def get_item_names():

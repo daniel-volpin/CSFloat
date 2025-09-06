@@ -1,12 +1,12 @@
 import streamlit as st
 from dotenv import load_dotenv
 
-from frontend.client.csfloat_api import fetch_listings
-from frontend.components.listings.listing_list import display_listings
-from frontend.components.listings.listing_insights import listing_analysis
-from frontend.components.listings.listing_filters import filter_sidebar
-from frontend.components.ui.main_header import custom_header
-from frontend.config.settings import APP_TITLE, APP_SUBTITLE
+from client.csfloat_api import fetch_listings, ApiClientError
+from components.listings.listing_list import display_listings
+from components.listings.listing_insights import listing_analysis
+from components.listings.listing_filters import filter_sidebar
+from components.ui.main_header import custom_header
+from config.settings import APP_TITLE, APP_SUBTITLE
 
 load_dotenv()
 
@@ -44,6 +44,8 @@ with st.container():
             with st.spinner("Loading listings..."):
                 try:
                     items = fetch_listings(params)
+                except ApiClientError as e:
+                    error_message = e.user_message
                 except Exception:
                     error_message = "Unable to connect to backend service. Please ensure the backend server is running and reachable."
             display_listings(items, error_message)

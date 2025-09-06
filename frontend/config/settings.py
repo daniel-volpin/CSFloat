@@ -1,5 +1,3 @@
-# config.py - Centralized configuration for frontend
-
 import os
 from dotenv import load_dotenv
 

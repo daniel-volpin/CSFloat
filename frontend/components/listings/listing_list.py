@@ -1,6 +1,6 @@
 import streamlit as st
 from typing import List, Optional
-from frontend.components.ui.item_card import display_item
+from components.ui.item_card import display_item
 
 
 def display_listings(items: Optional[List], error_message: Optional[str] = None):
