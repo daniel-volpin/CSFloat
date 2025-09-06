@@ -130,8 +130,7 @@ def get_item_names(limit: int = Query(50, ge=1, le=200)):
             entries = []
         names = sorted(
             {
-                (entry.get("item") or {}).get("name")
-                or entry.get("item_name")
+                (entry.get("item") or {}).get("name") or entry.get("item_name")
                 for entry in entries
                 if ((entry.get("item") or {}).get("name") or entry.get("item_name"))
             }

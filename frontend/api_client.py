@@ -13,7 +13,9 @@ DEFAULT_TIMEOUT = (3.05, 10)
 def fetch_listings(params):
     start = time.time()
     try:
-        response = requests.get(LISTINGS_ENDPOINT, params=params, timeout=DEFAULT_TIMEOUT)
+        response = requests.get(
+            LISTINGS_ENDPOINT, params=params, timeout=DEFAULT_TIMEOUT
+        )
         response.raise_for_status()
         data = response.json()
         if not isinstance(data, dict) or "data" not in data:
@@ -65,7 +67,9 @@ def fetch_listings(params):
 @st.cache_data(show_spinner=False)
 def fetch_item_names(limit: int = 50) -> list[str]:
     try:
-        resp = requests.get(ITEM_NAMES_ENDPOINT, params={"limit": limit}, timeout=DEFAULT_TIMEOUT)
+        resp = requests.get(
+            ITEM_NAMES_ENDPOINT, params={"limit": limit}, timeout=DEFAULT_TIMEOUT
+        )
         resp.raise_for_status()
         data = resp.json()
         names = data.get("names") if isinstance(data, dict) else None
