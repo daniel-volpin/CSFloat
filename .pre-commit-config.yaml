@@ -3,6 +3,11 @@ repos:
     rev: 24.4.2
     hooks:
       - id: black
+  - repo: https://github.com/PyCQA/autoflake
+    rev: v2.3.1
+    hooks:
+      - id: autoflake
+        args: ["--remove-all-unused-imports", "--remove-unused-variables", "--expand-star-imports"]
   - repo: https://github.com/pycqa/isort
     rev: 5.13.2
     hooks:
@@ -12,3 +17,8 @@ repos:
     hooks:
       - id: flake8
         additional_dependencies: []
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.2
+    hooks:
+      - id: ruff
+        args: ["--fix"]
