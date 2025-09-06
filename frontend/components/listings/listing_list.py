@@ -1,6 +1,6 @@
 import streamlit as st
 from typing import List, Optional
-from components.ui.item_card import display_item
+from components.ui.item_card import display_item_card
 
 
 def display_listings(items: Optional[List], error_message: Optional[str] = None):
@@ -19,6 +19,6 @@ def display_listings(items: Optional[List], error_message: Optional[str] = None)
         st.markdown("#### Listings Results")
         if items:
             for item in items:
-                display_item(item)
+                display_item_card(item)
         else:
             st.warning("No listings found for the selected filters.")

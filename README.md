@@ -1,117 +1,76 @@
+<a id="readme-top"></a>
+
 # CSFloat — Listings Explorer
 
-## Overview
-- A two-tier app to discover and filter CS:GO item listings for investing.
-- Backend: FastAPI wrapper around CSFloat’s marketplace API with caching.
-- Frontend: Streamlit UI for filtering and viewing items; includes an AI assistant to analyze the currently loaded listings.
+[![FastAPI](https://img.shields.io/badge/FastAPI-005571?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io)
+[![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org)
 
-## Architecture
-- Backend
-  - Routes: `GET /api/listings`, `GET /api/item-names`
-  - Files: `backend/main.py`, `backend/api.py`, `backend/models.py`, `backend/utils.py`
-  - Cache: In-memory, 5-minute TTL (listings + names)
-- Frontend
-  - Files: `frontend/app.py`, `frontend/api_client.py`, `frontend/components/*`, `frontend/config.py`, `frontend/models.py`, `frontend/llm_client.py`
+Discover and filter CS:GO/CS2 item listings with a Streamlit UI and a FastAPI backend. Optional AI analysis runs server-side.
 
-## Prerequisites
-- Python 3.10+
-- CSFloat API key
-- Optional: OpenAI API key for AI analysis
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li><a href="#about-the-project">About</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#getting-started">Getting Started</a></li>
+    <li><a href="#running">Running</a></li>
+    <li><a href="#api-reference">API</a></li>
+    <li><a href="#troubleshooting">Troubleshooting</a></li>
+  </ol>
+</details>
 
-## Quick Start
+## About the Project
 
-### Backend (conda)
+Two-tier app: Streamlit frontend calls a small FastAPI service that standardizes responses and hosts AI-assisted analysis.
+
+## Features
+
+- Filter listings by price, float, rarity, and more.
+- AI insights over the currently loaded items (backend-only OpenAI).
+- Consistent error JSON and friendly UI messages.
+
+## Getting Started
+
+Single conda env for both backend and frontend.
+
 ```bash
-cd backend
+# Create env
+conda create -n csfloat python=3.11 -y
+conda activate csfloat
 
-# Option A: Use the provided environment.yml
-conda env create -f environment.yml
-conda activate csfloat-backend
+# Install deps
+pip install -r backend/requirements.txt
+pip install -r frontend/requirements.txt
 
-# Option B: Create an env and install via pip
-conda create -n csfloat-backend python=3.11 -y
-conda activate csfloat-backend
-pip install -r requirements.txt
+# Backend env (backend/.env)
+printf "CSFLOAT_API_KEY=your_csfloat_key\nOPENAI_API_KEY=your_openai_key\n" > backend/.env
+# Optional demo: echo "USE_DUMMY_DATA=true" >> backend/.env
 
-# Provide your CSFloat API key
-export CSFLOAT_API_KEY="<your_key>"
-# or create backend/.env with:
-# CSFLOAT_API_KEY=<your_key>
-
-uvicorn backend.main:app --reload
-# OpenAPI docs: http://localhost:8000/docs
+# Frontend env (frontend/.env)
+printf "API_BASE_URL=http://localhost:8000\n" > frontend/.env
 ```
 
-### Frontend (conda)
-```bash
-cd frontend
+## Running
 
-# Option A: Use the provided environment.yml
-conda env create -f environment.yml
-conda activate csfloat-frontend
+Open two terminals (env: `csfloat`):
 
-# Option B: Create an env and install via pip
-conda create -n csfloat-frontend python=3.11 -y
-conda activate csfloat-frontend
-pip install -r requirements.txt
+- Backend: `uvicorn backend.main:app --reload` (docs: http://localhost:8000/docs)
+- Frontend: `cd frontend && streamlit run app.py`
 
-# Point to your backend (default is http://localhost:8000)
-export API_BASE_URL="http://localhost:8000"
-# or create frontend/.env with:
-# API_BASE_URL=http://localhost:8000
+## API Reference
 
-streamlit run app.py
-```
+- `GET /api/ping` — health check
+- `GET /api/listings` — returns `{ data: ItemDTO[] }`
+- `GET /api/item-names` — returns `{ names: string[] }`
+- `POST /api/analyze` — `{ question, items, model?, max_items? } -> { result }`
 
-## Configuration
-- Backend
-  - `CSFLOAT_API_KEY` (required): Your CSFloat API token.
-- Frontend
-  - `API_BASE_URL` (optional): Defaults to `http://localhost:8000`.
-  - AI:
-    - OpenAI: `OPENAI_API_KEY` and optional `OPENAI_MODEL` (e.g., `gpt-5-nano`).
-    - Optional: `OPENAI_BASE_URL` if proxying/self-hosting.
-
-Use OpenAI directly
-- Set `OPENAI_API_KEY` (and optionally `OPENAI_MODEL`, default is `gpt-5-nano`). If this model is not available to your account, use `gpt-4o-mini`.
-
-Important: Do not commit API keys or secrets. Keep `.env` files private.
-Tip (conda): To update envs after changing requirements, run `conda env update -f environment.yml` in each folder.
-
-## Backend API
-- `GET /api/listings`
-  - Returns: `{ data: [...], cursor: <str|null> }`
-  - Common query params: `limit` (1–50), `sort_by`, `category`, `def_index` (repeatable), `min_float`, `max_float`, `rarity` (comma-separated), `paint_seed` (repeatable), `paint_index`, `user_id`, `collection`, `min_price`, `max_price`, `market_hash_name`, `item_name`, `type`, `stickers`.
-  - Example:
-    ```bash
-    curl "http://localhost:8000/api/listings?limit=5&sort_by=best_deal&min_float=0.01&max_float=0.15"
-    ```
-- `GET /api/item-names`
-  - Returns: `{ names: ["AK-47 | Redline", ...] }`
-  - Params: `limit` (1–200)
-  - Example:
-    ```bash
-    curl "http://localhost:8000/api/item-names?limit=50"
-    ```
-
-## Using AI to Analyze Listings
-This feature lets you ask an LLM about the listings already loaded in the UI (no external lookups).
-
-1) Configure API access (OpenAI) via env vars in the Frontend section above.
-2) In the Streamlit app, open “Ask AI about current listings”.
-3) Enter a question (e.g., “Best low-float AKs under $200?”) and click “Analyze Listings with AI”.
-
-Notes
-- The app sends a concise digest per item: index, name, price, wear, rarity, float; you can control how many items are included.
-- The model will recommend items by index/name with a short rationale; it does not fetch external prices.
- - Responses are capped at ~300 tokens to control costs.
+Errors use `{ error, message, details? }`. When `USE_DUMMY_DATA=false` and no real data source, listings/names return `503`.
 
 ## Troubleshooting
-- 401 Unauthorized (backend): Verify `CSFLOAT_API_KEY`.
-- 502 (backend): Upstream CSFloat error or timeout. Retry; check logs.
-- Frontend can’t connect: Ensure backend is running and `API_BASE_URL` is correct.
-- AI errors: Ensure `OPENAI_API_KEY` is set and the model exists.
-- TypeError about `proxies` in OpenAI client: Update `httpx` to >= 0.27.0 in the frontend env:
-  ```bash
-  pip install -U httpx
-  ```
+
+- Cannot reach backend: verify it runs and `API_BASE_URL` is correct.
+- `503` on listings/names: start data source or set `USE_DUMMY_DATA=true`.
+- AI errors: ensure `OPENAI_API_KEY` is set (backend).
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
