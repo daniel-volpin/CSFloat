@@ -23,13 +23,34 @@ def filter_sidebar():
         )
         rarity = st.multiselect("Rarity", RARITY_OPTIONS)
     with st.sidebar.expander("Item Details", expanded=False):
-        paint_seed = st.text_input("Paint Seed", "")
+        paint_seed_input = st.text_input("Paint Seed (comma separated)", "")
+        paint_seeds = [int(x.strip()) for x in paint_seed_input.split(",") if x.strip().isdigit()] if paint_seed_input else None
         paint_index = st.text_input("Paint Index", "")
         user_id = st.text_input("User ID", "")
         collection = st.text_input("Collection", "")
-        market_hash_name = st.text_input("Market Hash Name", "")
-        type_ = st.selectbox("Type", ["", "buy_now", "auction"], index=0)
-        stickers = st.text_input("Stickers", "")
+        # Fetch available item names from API
+        from api_client import fetch_listings
+        @st.cache_data(show_spinner=False)
+        def get_item_names():
+            params = {"limit": 50}
+            # Only include params that are not None, not empty string, and not empty list
+            clean_params = {}
+            for k, v in params.items():
+                if v is None:
+                    continue
+                if isinstance(v, str) and v.strip() == "":
+                    continue
+                if isinstance(v, list) and len(v) == 0:
+                    continue
+                clean_params[k] = v
+            items = fetch_listings(clean_params)
+            names = sorted(set([item.name for item in items if hasattr(item, "name") and item.name]))
+            return names
+        item_names = get_item_names()
+    item_name = st.selectbox("Item Name", ["Any"] + item_names, index=0)
+    market_hash_name = st.text_input("Market Hash Name (manual search)", "")
+    type_ = st.selectbox("Type", ["", "buy_now", "auction"], index=0)
+    stickers = st.text_input("Stickers", "")
     with st.sidebar.expander("Price Filter", expanded=True):
         col1, col2 = st.columns(2)
         min_price_dollars = col1.number_input(
@@ -53,13 +74,14 @@ def filter_sidebar():
         "min_float": min_float,
         "max_float": max_float,
         "rarity": ",".join(rarity) if rarity else None,
-        "paint_seed": int(paint_seed) if paint_seed else None,
+        "paint_seed": paint_seeds if paint_seeds else None,
         "paint_index": int(paint_index) if paint_index else None,
         "user_id": user_id or None,
         "collection": collection or None,
         "min_price": int(min_price_dollars * 100) if min_price_dollars else None,
         "max_price": int(max_price_dollars * 100) if max_price_dollars else None,
-        "market_hash_name": market_hash_name or None,
+    "item_name": None if item_name == "Any" else item_name,
+    "market_hash_name": market_hash_name or None,
         "type": type_ or None,
         "stickers": stickers or None,
     }

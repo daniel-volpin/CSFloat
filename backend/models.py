@@ -48,5 +48,6 @@ class ListingQueryParams(BaseModel):
     min_price: Optional[int] = None
     max_price: Optional[int] = None
     market_hash_name: Optional[str] = None
+    item_name: Optional[str] = None
     type: Optional[str] = None
     stickers: Optional[str] = None
