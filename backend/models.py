@@ -41,7 +41,7 @@ class ListingQueryParams(BaseModel):
     min_float: Optional[float] = None
     max_float: Optional[float] = None
     rarity: Optional[str] = None
-    paint_seed: Optional[int] = None
+    paint_seed: Optional[List[int]] = None
     paint_index: Optional[int] = None
     user_id: Optional[str] = None
     collection: Optional[str] = None

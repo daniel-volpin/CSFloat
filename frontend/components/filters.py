@@ -32,29 +32,12 @@ def filter_sidebar():
         paint_index = st.text_input("Paint Index", "")
         user_id = st.text_input("User ID", "")
         collection = st.text_input("Collection", "")
-        # Fetch available item names from API
-        from api_client import fetch_listings
+        # Fetch available item names from lightweight endpoint
+        from api_client import fetch_item_names
 
-        @st.cache_data(show_spinner=False)
+        @st.cache_data(show_spinner=False, ttl=60)
         def get_item_names():
-            params = {"limit": 50}
-            # Only include params that are not None, not empty string, and not empty list
-            clean_params = {}
-            for k, v in params.items():
-                if v is None:
-                    continue
-                if isinstance(v, str) and v.strip() == "":
-                    continue
-                if isinstance(v, list) and len(v) == 0:
-                    continue
-                clean_params[k] = v
-            items = fetch_listings(clean_params)
-            names = sorted(
-                set(
-                    [item.name for item in items if hasattr(item, "name") and item.name]
-                )
-            )
-            return names
+            return fetch_item_names(limit=50)
 
         item_names = get_item_names()
     item_name = st.selectbox("Item Name", ["Any"] + item_names, index=0)

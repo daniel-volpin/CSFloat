@@ -1,16 +1,19 @@
 import requests
 import streamlit as st
 from models import ItemDTO
-from config import LISTINGS_ENDPOINT
+from config import LISTINGS_ENDPOINT, ITEM_NAMES_ENDPOINT
 
 import time
+
+
+DEFAULT_TIMEOUT = (3.05, 10)
 
 
 @st.cache_data(show_spinner=False)
 def fetch_listings(params):
     start = time.time()
     try:
-        response = requests.get(LISTINGS_ENDPOINT, params=params)
+        response = requests.get(LISTINGS_ENDPOINT, params=params, timeout=DEFAULT_TIMEOUT)
         response.raise_for_status()
         data = response.json()
         if not isinstance(data, dict) or "data" not in data:
@@ -56,4 +59,21 @@ def fetch_listings(params):
         import streamlit as st
 
         st.error(f"Unexpected error: {e}")
+        return []
+
+
+@st.cache_data(show_spinner=False)
+def fetch_item_names(limit: int = 50) -> list[str]:
+    try:
+        resp = requests.get(ITEM_NAMES_ENDPOINT, params={"limit": limit}, timeout=DEFAULT_TIMEOUT)
+        resp.raise_for_status()
+        data = resp.json()
+        names = data.get("names") if isinstance(data, dict) else None
+        if not isinstance(names, list):
+            return []
+        # Ensure only strings are returned
+        return [str(n) for n in names if isinstance(n, str) and n.strip()]
+    except Exception as e:
+        # Keep this quiet in UI; fallback to empty list
+        print(f"[WARN] fetch_item_names failed: {e}")
         return []
