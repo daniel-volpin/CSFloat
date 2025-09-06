@@ -1,27 +1,30 @@
 backend:
   - changed-files:
-      - any-glob-to-any-file: ['backend/**']
+      any-glob-to-any-file:
+        - 'backend/**'
 
 frontend:
   - changed-files:
-      - any-glob-to-any-file: ['frontend/**']
+      any-glob-to-any-file:
+        - 'frontend/**'
 
 ci:
   - changed-files:
-      - any-glob-to-any-file:
-          - '.github/**'
-          - 'pyproject.toml'
-          - '.pre-commit-config.yaml'
-          - '.editorconfig'
-          - '.flake8'
+      any-glob-to-any-file:
+        - '.github/**'
+        - 'pyproject.toml'
+        - '.pre-commit-config.yaml'
+        - '.editorconfig'
+        - '.flake8'
 
 docs:
   - changed-files:
-      - any-glob-to-any-file: ['**/*.md']
+      any-glob-to-any-file:
+        - '**/*.md'
 
 dependencies:
   - changed-files:
-      - any-glob-to-any-file:
-          - '**/requirements.txt'
-          - '**/environment.yml'
-          - '.github/dependabot.yml'
+      any-glob-to-any-file:
+        - '**/requirements.txt'
+        - '**/environment.yml'
+        - '.github/dependabot.yml'
