@@ -1,6 +1,7 @@
-import streamlit as st
 from typing import List, Optional
-from client.backend_service import BackendClient, BackendApiError
+
+import streamlit as st
+from client.backend_service import BackendApiError, BackendClient
 
 
 def listing_analysis(items: Optional[List], default_model: Optional[str] = None):

@@ -1,10 +1,10 @@
 import streamlit as st
 from config.settings import (
-    DEFAULT_LIMIT,
-    DEFAULT_FLOAT_RANGE,
-    RARITY_OPTIONS,
-    CATEGORY_OPTIONS,
     CATEGORY_MAP,
+    CATEGORY_OPTIONS,
+    DEFAULT_FLOAT_RANGE,
+    DEFAULT_LIMIT,
+    RARITY_OPTIONS,
     SORT_OPTIONS,
 )
 

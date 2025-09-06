@@ -1,8 +1,10 @@
 import os
-from fastapi import APIRouter, HTTPException, Body, Query
-from ..services.llm_client import ask_about_listings
-from ..models.models import ItemDTO
 from typing import List, Optional
+
+from fastapi import APIRouter, Body, HTTPException, Query
+
+from ..models.models import ItemDTO
+from ..services.llm_client import ask_about_listings
 
 router = APIRouter()
 

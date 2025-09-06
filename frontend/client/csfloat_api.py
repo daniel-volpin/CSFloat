@@ -1,9 +1,9 @@
 import time
-import requests
 from typing import Any, Dict, List
 
+import requests
+from config.settings import ITEM_NAMES_ENDPOINT, LISTINGS_ENDPOINT
 from models.listing_models import ItemDTO
-from config.settings import LISTINGS_ENDPOINT, ITEM_NAMES_ENDPOINT
 
 DEFAULT_TIMEOUT = (3.05, 10)
 

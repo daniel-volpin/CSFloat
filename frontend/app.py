@@ -1,12 +1,11 @@
 import streamlit as st
-from dotenv import load_dotenv
-
-from client.csfloat_api import fetch_listings, ApiClientError
-from components.listings.listing_list import display_listings
-from components.listings.listing_insights import listing_analysis
+from client.csfloat_api import ApiClientError, fetch_listings
 from components.listings.listing_filters import filter_sidebar
+from components.listings.listing_insights import listing_analysis
+from components.listings.listing_list import display_listings
 from components.ui.main_header import custom_header
-from config.settings import APP_TITLE, APP_SUBTITLE
+from config.settings import APP_SUBTITLE, APP_TITLE
+from dotenv import load_dotenv
 
 load_dotenv()
 

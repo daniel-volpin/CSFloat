@@ -1,5 +1,6 @@
 import os
 from typing import List, Optional
+
 from ..models.models import ItemDTO
 from .openai_client import OpenAIClient
 

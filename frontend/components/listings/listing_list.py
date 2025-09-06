@@ -1,5 +1,6 @@
-import streamlit as st
 from typing import List, Optional
+
+import streamlit as st
 from components.ui.item_card import display_item_card
 
 

@@ -1,6 +1,8 @@
 import os
-from openai import OpenAI
 from typing import Optional
+
+from openai import OpenAI
+
 from ..core.utils import OPENAI_API_KEY
 
 
