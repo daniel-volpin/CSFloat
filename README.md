@@ -62,6 +62,18 @@ Open two terminals (env: `csfloat`):
 - Backend: `uvicorn backend.main:app --reload` (docs: http://localhost:8000/docs)
 - Frontend: `cd frontend && streamlit run app.py`
 
+## Development
+
+Set up dev tooling and git hooks (Black, Ruff, Isort, Autoflake, Flake8, Mypy) using the Makefile:
+
+```bash
+make dev-install
+```
+
+Tips:
+- Update hooks to latest: `pre-commit autoupdate`
+- Run checks manually: `pre-commit run --all-files`
+
 ## API Reference
 
 - `GET /api/ping` — health check
