@@ -52,6 +52,6 @@ def ask_about_listings(
     try:
         resp = client.chat(model=chosen_model, messages=messages, temperature=0.2, max_tokens=300)
         return resp
-    except Exception as e:
+    except Exception:
         logging.exception("LLM request failed")
         return "LLM request failed due to an internal error."
