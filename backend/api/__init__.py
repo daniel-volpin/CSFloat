@@ -2,10 +2,12 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
+
 # Example route (health)
 @router.get("/ping")
 async def ping():
     return {"message": "pong"}
+
 
 # Include feature routers here to expose endpoints under /api
 try:

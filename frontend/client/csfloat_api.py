@@ -10,7 +10,13 @@ DEFAULT_TIMEOUT = (3.05, 10)
 
 # Lightweight client-side error types with user-friendly messages
 class ApiClientError(Exception):
-    def __init__(self, user_message: str, *, status_code: int | None = None, detail: str | None = None):
+    def __init__(
+        self,
+        user_message: str,
+        *,
+        status_code: int | None = None,
+        detail: str | None = None,
+    ):
         super().__init__(detail or user_message)
         self.user_message = user_message
         self.status_code = status_code
@@ -38,13 +44,25 @@ def _map_http_error(status: int, payload: Dict[str, Any] | None) -> ApiClientErr
         504: "Gateway timeout. Please try again later.",
     }
     base = messages.get(status, f"HTTP {status} error.")
-    user_message = server_msg if isinstance(server_msg, str) and server_msg.strip() else base
-    return ApiClientError(user_message, status_code=status, detail=str(server_msg) if server_msg else None)
+    user_message = (
+        server_msg if isinstance(server_msg, str) and server_msg.strip() else base
+    )
+    return ApiClientError(
+        user_message, status_code=status, detail=str(server_msg) if server_msg else None
+    )
 
 
-def _request_json(method: str, url: str, *, params: Dict[str, Any] | None = None, json: Any | None = None) -> Dict[str, Any]:
+def _request_json(
+    method: str,
+    url: str,
+    *,
+    params: Dict[str, Any] | None = None,
+    json: Any | None = None,
+) -> Dict[str, Any]:
     try:
-        resp = requests.request(method, url, params=params, json=json, timeout=DEFAULT_TIMEOUT)
+        resp = requests.request(
+            method, url, params=params, json=json, timeout=DEFAULT_TIMEOUT
+        )
         # Attempt to parse JSON payload early for richer errors
         payload: Dict[str, Any] | None = None
         try:
@@ -84,7 +102,9 @@ def fetch_listings(params: Dict[str, Any]) -> List[ItemDTO]:
     if not isinstance(items_raw, list):
         raise ApiClientError("Unexpected listings payload from server.")
 
-    listings = [ItemDTO.from_dict(_merge_item(e)) for e in items_raw if isinstance(e, dict)]
+    listings = [
+        ItemDTO.from_dict(_merge_item(e)) for e in items_raw if isinstance(e, dict)
+    ]
 
     elapsed = time.time() - start
     if elapsed < 0.1:

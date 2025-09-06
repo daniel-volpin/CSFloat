@@ -12,9 +12,17 @@ class BackendApiError(Exception):
         self.status = status
 
 
-def _request_json(method: str, url: str, *, params: Dict[str, Any] | None = None, json: Any | None = None) -> Dict[str, Any]:
+def _request_json(
+    method: str,
+    url: str,
+    *,
+    params: Dict[str, Any] | None = None,
+    json: Any | None = None,
+) -> Dict[str, Any]:
     try:
-        resp = requests.request(method, url, params=params, json=json, timeout=DEFAULT_TIMEOUT)
+        resp = requests.request(
+            method, url, params=params, json=json, timeout=DEFAULT_TIMEOUT
+        )
         try:
             payload = resp.json()
         except Exception:
@@ -23,7 +31,9 @@ def _request_json(method: str, url: str, *, params: Dict[str, Any] | None = None
             message = None
             if isinstance(payload, dict):
                 message = payload.get("message") or payload.get("detail")
-            raise BackendApiError(message or f"HTTP {resp.status_code} error", status=resp.status_code)
+            raise BackendApiError(
+                message or f"HTTP {resp.status_code} error", status=resp.status_code
+            )
         if not isinstance(payload, dict):
             raise BackendApiError("Unexpected response format from backend")
         return payload
@@ -55,12 +65,15 @@ class BackendClient:
         model: Optional[str] = None,
         max_items: int = 50,
     ) -> str:
-        serializable_items = [item.dict() if hasattr(item, "dict") else item for item in items]
-        payload = {"question": question, "items": serializable_items, "model": model, "max_items": max_items}
+        serializable_items = [
+            item.dict() if hasattr(item, "dict") else item for item in items
+        ]
+        payload = {
+            "question": question,
+            "items": serializable_items,
+            "model": model,
+            "max_items": max_items,
+        }
         data = _request_json("POST", f"{self.base_url}/api/analyze", json=payload)
         # Backend currently returns {"result": ...}
-        return (
-            data.get("result")
-            or data.get("answer")
-            or "No answer returned."
-        )
+        return data.get("result") or data.get("answer") or "No answer returned."

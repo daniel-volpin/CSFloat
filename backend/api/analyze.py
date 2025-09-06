@@ -8,6 +8,7 @@ router = APIRouter()
 
 USE_DUMMY_DATA = os.getenv("USE_DUMMY_DATA", "false").lower() in ("1", "true", "yes")
 
+
 @router.get("/item-names")
 def fetch_item_names_endpoint(limit: int = 50):
     # In production, disable dummy responses and return 503
