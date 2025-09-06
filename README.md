@@ -2,9 +2,13 @@
 
 # CSFloat — Listings Explorer
 
+[![CI](https://github.com/daniel-volpin/CSFloat/actions/workflows/ci.yml/badge.svg)](https://github.com/daniel-volpin/CSFloat/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/daniel-volpin/CSFloat/actions/workflows/codeql.yml/badge.svg)](https://github.com/daniel-volpin/CSFloat/actions/workflows/codeql.yml)
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org)
+
+[Demo](#running) • [Docs](#api-reference) • [Issues](../../issues) • [PRs](../../pulls)
 
 Discover and filter CS:GO/CS2 item listings with a Streamlit UI and a FastAPI backend. Optional AI analysis runs server-side.
 
