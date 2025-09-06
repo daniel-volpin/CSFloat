@@ -30,7 +30,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r backend/requirements.txt -r frontend/requirements.txt
-          pip install black==24.4.2 isort==5.13.2 flake8==7.0.0 mypy==1.11.1 types-requests types-python-dotenv
+          pip install black==24.4.2 isort==5.13.2 flake8==7.0.0 mypy==1.11.1 types-requests
 
       - name: Black (format check)
         run: black --check .
@@ -43,4 +43,3 @@ jobs:
 
       - name: Mypy (type check)
         run: mypy backend frontend
-
