@@ -1,10 +1,11 @@
 SHELL := /bin/bash
 
-.PHONY: help install lint format type fix run-backend run-frontend precommit init
+.PHONY: help install dev-install lint format type fix run-backend run-frontend precommit init
 
 help:
 	@echo "Common targets:"
 	@echo "  install       Install backend+frontend deps into current env"
+	@echo "  dev-install   Install dev tools + pre-commit"
 	@echo "  lint          Run flake8 and ruff"
 	@echo "  format        Run isort and black"
 	@echo "  type          Run mypy"
@@ -15,6 +16,12 @@ help:
 
 install:
 	pip install -r backend/requirements.txt -r frontend/requirements.txt
+
+dev-install:
+	# Core dev tooling
+	pip install pre-commit black ruff flake8 isort autoflake mypy
+	# Install git hook managed by pre-commit
+	pre-commit install
 
 lint:
 	ruff check .
@@ -40,4 +47,3 @@ run-frontend:
 
 precommit:
 	pre-commit install
-
