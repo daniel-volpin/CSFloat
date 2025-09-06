@@ -1,5 +1,6 @@
 import os
 from typing import List, Optional
+import logging
 
 from ..models.models import ItemDTO
 from .openai_client import OpenAIClient
@@ -51,5 +52,6 @@ def ask_about_listings(
     try:
         resp = client.chat(model=chosen_model, messages=messages, temperature=0.2, max_tokens=300)
         return resp
-    except Exception as e:
-        return f"LLM request failed: {str(e)}"
+    except Exception:
+        logging.exception("LLM request failed")
+        return "LLM request failed due to an internal error."
