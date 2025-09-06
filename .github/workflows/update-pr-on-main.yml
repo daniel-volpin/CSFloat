@@ -13,11 +13,33 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Update open PR branches with latest base
-        uses: peter-evans/update-branch@v3
+        uses: actions/github-script@v7
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          target-branch: ${{ github.ref_name }}
-          # Optional filters:
-          # exclude-drafts: true
-          # labels: auto-update
-          # exclude-labels: no-auto-update
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const base = context.ref.replace('refs/heads/', '');
+            // List open PRs targeting this base branch
+            const prs = await github.paginate(github.rest.pulls.list, {
+              owner,
+              repo,
+              state: 'open',
+              base,
+              per_page: 100,
+            });
+            core.info(`Found ${prs.length} open PR(s) targeting ${base}`);
+            for (const pr of prs) {
+              // Optionally skip drafts or label-filter here
+              // if (pr.draft) continue;
+              try {
+                await github.rest.pulls.updateBranch({
+                  owner,
+                  repo,
+                  pull_number: pr.number,
+                });
+                core.info(`Updated PR #${pr.number} (${pr.head.ref}) with ${base}`);
+              } catch (err) {
+                core.warning(`Failed to update PR #${pr.number}: ${err.message}`);
+              }
+            }
