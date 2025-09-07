@@ -1,10 +1,11 @@
 import streamlit as st
 from components.listings.render_filter_sidebar import filter_sidebar
+from components.listings.render_listings import render_listings
+from components.listings.render_listings_analysis import render_listing_analysis
 from components.ui.app_main_header_ui import render_header
 from config.settings import APP_SUBTITLE, APP_TITLE
 from dotenv import load_dotenv
-from pages.home import render_home_tab
-from pages.settings import render_settings_tab
+from utils.listings import fetch_and_store_listings
 
 
 def main() -> None:
@@ -13,22 +14,37 @@ def main() -> None:
     """
     load_dotenv()
     render_header(APP_TITLE, subtitle=APP_SUBTITLE)
-    tabs = st.tabs(["Home", "Settings"])
-    with st.sidebar:
-        st.markdown("#### Filters")
     params, filters_submitted = filter_sidebar()
     params = {k: v for k, v in params.items() if v is not None}
-    if filters_submitted:
-        from utils.session import set_filters_applied
 
-        set_filters_applied(True)
-    with st.sidebar:
-        st.markdown("---")
-        st.caption("Use the filters above to refine your search.")
-    with tabs[0]:
-        render_home_tab(params)
-    with tabs[1]:
-        render_settings_tab()
+    # Persist filter values in session_state
+    if "filters" not in st.session_state:
+        st.session_state["filters"] = {}
+    if "filters_applied" not in st.session_state:
+        st.session_state["filters_applied"] = False
+    if filters_submitted:
+        st.session_state["filters"] = params
+        st.session_state["filters_applied"] = True
+
+    active_params = st.session_state["filters"] if st.session_state["filters_applied"] else {}
+    st.markdown("")
+    items = None
+    error_message = None
+
+    col1, col2 = st.columns([1.2, 1.8], gap="large")
+    with col1:
+        st.markdown("<h2 style='margin-bottom:0.5em;'>Listings</h2>", unsafe_allow_html=True)
+        if st.session_state["filters_applied"]:
+            with st.spinner("Loading listings..."):
+                items, error_message = fetch_and_store_listings(active_params)
+            render_listings(items, error_message)
+        else:
+            st.info("Apply filters to see listings.")
+    with col2:
+        st.markdown(
+            "<h2 style='margin-bottom:0.5em;'>Analyze Listings with AI</h2>", unsafe_allow_html=True
+        )
+        render_listing_analysis(items if items else [])
 
 
 if __name__ == "__main__":
