@@ -2,6 +2,7 @@ import logging
 import os
 from typing import List, Optional
 
+from ..config.settings import get_settings
 from ..models.models import ItemDTO
 from .openai_client import OpenAIClient
 
@@ -27,7 +28,8 @@ def ask_about_listings(
     if not items:
         return "No listings are loaded. Adjust filters and try again."
     client = OpenAIClient()
-    chosen_model = model or os.getenv("OPENAI_MODEL") or "gpt-4o-mini"
+    settings = get_settings()
+    chosen_model = model or settings.OPENAI_MODEL or os.getenv("OPENAI_MODEL") or "gpt-4o-mini"
     reduced_items = max_items
     if "gpt-5-nano" in chosen_model.lower():
         reduced_items = min(max_items, 10)

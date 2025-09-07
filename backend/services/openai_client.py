@@ -3,7 +3,7 @@ from typing import Optional
 
 from openai import OpenAI
 
-from ..core.utils import OPENAI_API_KEY
+from ..config.settings import get_settings
 
 
 class OpenAIClient:
@@ -12,8 +12,9 @@ class OpenAIClient:
     """
 
     def __init__(self, api_key: Optional[str] = None, base_url: Optional[str] = None):
-        self.api_key = api_key or OPENAI_API_KEY
-        self.base_url = base_url or os.getenv("OPENAI_BASE_URL")
+        settings = get_settings()
+        self.api_key = api_key or settings.OPENAI_API_KEY or os.getenv("OPENAI_API_KEY")
+        self.base_url = base_url or settings.OPENAI_BASE_URL or os.getenv("OPENAI_BASE_URL")
         if not self.api_key:
             raise RuntimeError("OPENAI_API_KEY is not set")
         if self.base_url:

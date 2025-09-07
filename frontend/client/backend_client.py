@@ -1,11 +1,13 @@
 import time
 from typing import Any, Dict, List, Optional
 
-import requests
+import httpx
 from config.settings import API_BASE_URL, LISTINGS_ENDPOINT
 from models.listing_models import ItemDTO
 
-DEFAULT_TIMEOUT = (3.05, 10)
+_client = httpx.Client(
+    timeout=httpx.Timeout(connect=3.05, read=10.0, write=10.0, pool=3.0),
+)
 
 
 class ApiClientError(Exception):
@@ -61,14 +63,14 @@ def _request_json(
     error_cls=ApiClientError,
 ) -> Dict[str, Any]:
     try:
-        resp = requests.request(method, url, params=params, json=json, timeout=DEFAULT_TIMEOUT)
+        resp = _client.request(method, url, params=params, json=json)
         payload: Dict[str, Any] | None = None
         try:
             payload = resp.json()
         except Exception:
             payload = None
 
-        if not resp.ok:
+        if not (200 <= resp.status_code < 300):
             raise (error_cls if error_cls is not None else ApiClientError)(
                 (_map_http_error(resp.status_code, payload).user_message),
                 status_code=resp.status_code,
@@ -78,11 +80,13 @@ def _request_json(
         if not isinstance(payload, dict):
             raise error_cls("Unexpected response format from server.")
         return payload
-    except requests.Timeout:
+    except httpx.ConnectTimeout:
+        raise error_cls("Connection timed out. Please try again.")
+    except httpx.ReadTimeout:
         raise error_cls("Request timed out. Please try again.")
-    except requests.ConnectionError:
+    except httpx.ConnectError:
         raise error_cls("Cannot reach backend. Verify the server is running and reachable.")
-    except requests.RequestException as e:
+    except httpx.HTTPError as e:
         raise error_cls("Network error occurred. Please try again.", detail=str(e))
 
 

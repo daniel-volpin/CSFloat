@@ -1,11 +1,50 @@
+from contextlib import asynccontextmanager
+
+import httpx
 from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from .api import router
+from .config.settings import get_settings
+from .services.csfloat_client import set_http_client
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Create shared HTTP client for upstream requests
+    settings = get_settings()
+    http2_enabled = bool(settings.HTTP2_ENABLED)
+    try:
+        if http2_enabled:
+            import h2  # type: ignore  # noqa: F401
+        else:
+            http2_enabled = False
+    except Exception:
+        http2_enabled = False
+
+    client = httpx.Client(
+        http2=http2_enabled,
+        timeout=httpx.Timeout(
+            connect=float(settings.REQUEST_CONNECT_TIMEOUT),
+            read=float(settings.REQUEST_READ_TIMEOUT),
+            write=float(settings.REQUEST_READ_TIMEOUT),
+            pool=float(settings.HTTPX_POOL_TIMEOUT),
+        ),
+        limits=httpx.Limits(
+            max_keepalive_connections=int(settings.HTTPX_MAX_KEEPALIVE),
+            max_connections=int(settings.HTTPX_MAX_CONNECTIONS),
+        ),
+    )
+    set_http_client(client)
+    try:
+        yield
+    finally:
+        client.close()
+
+
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
