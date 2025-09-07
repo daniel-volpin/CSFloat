@@ -1,6 +1,6 @@
-<a id="readme-top"></a>
-
 # CSFloat — Listings Explorer
+
+[//]: # (readme-top)
 
 [![CI](https://github.com/daniel-volpin/CSFloat/actions/workflows/ci.yml/badge.svg)](https://github.com/daniel-volpin/CSFloat/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/daniel-volpin/CSFloat/actions/workflows/codeql.yml/badge.svg)](https://github.com/daniel-volpin/CSFloat/actions/workflows/codeql.yml)
@@ -12,17 +12,14 @@
 
 Discover and filter CS:GO/CS2 item listings with a Streamlit UI and a FastAPI backend. Optional AI analysis runs server-side.
 
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li><a href="#about-the-project">About</a></li>
-    <li><a href="#features">Features</a></li>
-    <li><a href="#getting-started">Getting Started</a></li>
-    <li><a href="#running">Running</a></li>
-    <li><a href="#api-reference">API</a></li>
-    <li><a href="#troubleshooting">Troubleshooting</a></li>
-  </ol>
-</details>
+## Table of Contents
+
+- [About](#about-the-project)
+- [Features](#features)
+- [Getting Started](#getting-started)
+- [Running](#running)
+- [API](#api-reference)
+- [Troubleshooting](#troubleshooting)
 
 ## About the Project
 
@@ -59,7 +56,7 @@ printf "API_BASE_URL=http://localhost:8000\n" > frontend/.env
 
 Open two terminals (env: `csfloat`):
 
-- Backend: `uvicorn backend.main:app --reload` (docs: http://localhost:8000/docs)
+- Backend: `uvicorn backend.main:app --reload` (docs: <http://localhost:8000/docs>)
 - Frontend: `cd frontend && streamlit run app.py`
 
 ## Development
@@ -71,6 +68,7 @@ make dev-install
 ```
 
 Tips:
+
 - Update hooks to latest: `pre-commit autoupdate`
 - Run checks manually: `pre-commit run --all-files`
 
@@ -88,5 +86,5 @@ Errors use `{ error, message, details? }`. When `USE_DUMMY_DATA=false` and no re
 - Cannot reach backend: verify it runs and `API_BASE_URL` is correct.
 - `503` on listings/names: start data source or set `USE_DUMMY_DATA=true`.
 - AI errors: ensure `OPENAI_API_KEY` is set (backend).
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+[⬆️ Back to top](#csfloat--listings-explorer)
+[⬆️ Back to top](#readme-top)
