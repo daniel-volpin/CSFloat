@@ -1,4 +1,3 @@
-import logging
 import os
 from typing import List, Optional
 
@@ -51,9 +50,4 @@ def ask_about_listings(
         {"role": "system", "content": system},
         {"role": "user", "content": user},
     ]
-    try:
-        resp = client.chat(model=chosen_model, messages=messages, temperature=0.2, max_tokens=300)
-        return resp
-    except Exception:
-        logging.exception("LLM request failed")
-        return "LLM request failed due to an internal error."
+    return client.chat(model=chosen_model, messages=messages, temperature=0.2, max_tokens=300)

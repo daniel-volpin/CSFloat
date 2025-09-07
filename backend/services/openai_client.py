@@ -1,6 +1,7 @@
 import os
 from typing import Optional
 
+import httpx
 from openai import OpenAI
 
 from ..config.settings import get_settings
@@ -17,10 +18,27 @@ class OpenAIClient:
         self.base_url = base_url or settings.OPENAI_BASE_URL or os.getenv("OPENAI_BASE_URL")
         if not self.api_key:
             raise RuntimeError("OPENAI_API_KEY is not set")
+
+        http_client = self._build_http_client()
         if self.base_url:
-            self.client = OpenAI(api_key=self.api_key, base_url=self.base_url)
+            self.client = OpenAI(
+                api_key=self.api_key, base_url=self.base_url, http_client=http_client
+            )
         else:
-            self.client = OpenAI(api_key=self.api_key)
+            self.client = OpenAI(api_key=self.api_key, http_client=http_client)
+
+    def _build_http_client(self) -> httpx.Client | None:
+        """Build an httpx client that respects environment proxy settings.
+
+        We avoid passing unsupported kwargs into the OpenAI SDK by constructing
+        our own httpx client and handing it in via `http_client`. Rely on
+        `trust_env=True` so standard env vars (HTTP(S)_PROXY, ALL_PROXY) are used.
+        """
+        timeout = httpx.Timeout(connect=10.0, read=30.0, write=30.0, pool=5.0)
+        try:
+            return httpx.Client(timeout=timeout, trust_env=True)
+        except Exception:
+            return None
 
     def chat(
         self,
