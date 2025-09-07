@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List
 
-from ...models.models import ItemDTO
+from ...models.item_dto import ItemDTO
 
 
 def build_listings_digest(items: List[ItemDTO], max_items: int = 50) -> str:

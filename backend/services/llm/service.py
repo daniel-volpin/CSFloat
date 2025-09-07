@@ -4,7 +4,7 @@ import os
 from typing import List, Optional
 
 from ...config.settings import get_settings
-from ...models.models import ItemDTO
+from ...models.item_dto import ItemDTO
 from .formatting import build_listings_digest
 from .openai_client import OpenAIClient
 from .router import choose_provider_and_model, get_provider

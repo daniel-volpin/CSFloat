@@ -4,7 +4,7 @@ from fastapi import APIRouter, Body, HTTPException
 from openai import AuthenticationError
 from pydantic import BaseModel
 
-from ...models.models import ItemDTO
+from ...models.item_dto import ItemDTO
 from ...services.llm.client import LLMClient
 
 router = APIRouter()

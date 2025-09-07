@@ -3,7 +3,7 @@ from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 
-from ...models.models import ItemDTO
+from ...models.item_dto import ItemDTO
 from ...services.csfloat.client import CSFloatClient
 
 
