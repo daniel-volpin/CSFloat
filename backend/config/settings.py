@@ -54,7 +54,7 @@ class Settings(BaseSettings):
 
     @field_validator("CORS_ALLOW_ORIGINS", mode="before")
     @classmethod
-    def parse_cors_origins(cls, v):  # type: ignore[override]
+    def parse_cors_origins(cls, v: str | List[str]) -> List[str]:  # type: ignore[override]
         """Allow comma-separated string or JSON list for CORS origins.
 
         Examples:

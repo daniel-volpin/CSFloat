@@ -3,7 +3,8 @@ from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 
-from ...models.item_dto import ItemDTO
+from ...core.exceptions import BackendError, UpstreamServiceError, ValidationError
+from ...models.item_dto import ItemDTO, item_to_dto
 from ...services.csfloat.client import CSFloatClient
 
 
@@ -36,7 +37,7 @@ def get_listings(
     item_name: Optional[str] = Query(None),
     type: Optional[str] = Query(None),
     stickers: Optional[str] = Query(None),
-):
+) -> ListingsResponse:
     try:
         params = {
             "limit": limit,
@@ -59,6 +60,15 @@ def get_listings(
             "stickers": stickers,
         }
         items, cache_status = csfloat_client.fetch_listings(params)
-        return {"data": items, "meta": {"cache": cache_status}}
+        item_dtos = [item_to_dto(item) for item in items]
+        return ListingsResponse(data=item_dtos, meta={"cache": cache_status})
+    except UpstreamServiceError as e:
+        raise HTTPException(
+            status_code=503, detail=f"Upstream listings service unavailable: {str(e)}"
+        )
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=f"Validation error: {str(e)}")
+    except BackendError as e:
+        raise HTTPException(status_code=500, detail=f"Internal backend error: {str(e)}")
     except Exception as e:
-        raise HTTPException(status_code=503, detail=f"Listings service unavailable: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")

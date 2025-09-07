@@ -1,8 +1,9 @@
 from typing import List
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
+from ...core.exceptions import BackendError, UpstreamServiceError, ValidationError
 from ...services.llm.registry import LLMModelInfo, list_models
 
 router = APIRouter()
@@ -21,8 +22,19 @@ class LlmModelsResponse(BaseModel):
 
 @router.get("/models", response_model=LlmModelsResponse)
 def list_llm_models() -> LlmModelsResponse:
-    entries: List[LLMModelInfo] = list_models()
-    options: List[LlmModelOption] = [
-        LlmModelOption(label=e.display, value=f"{e.provider}:{e.key}") for e in entries
-    ]
-    return LlmModelsResponse(models=options)
+    try:
+        entries: List[LLMModelInfo] = list_models()
+        options: List[LlmModelOption] = [
+            LlmModelOption(label=e.display, value=f"{e.provider}:{e.key}") for e in entries
+        ]
+        return LlmModelsResponse(models=options)
+    except UpstreamServiceError as e:
+        raise HTTPException(
+            status_code=503, detail=f"Upstream LLM model service unavailable: {str(e)}"
+        )
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=f"Validation error: {str(e)}")
+    except BackendError as e:
+        raise HTTPException(status_code=500, detail=f"Internal backend error: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")

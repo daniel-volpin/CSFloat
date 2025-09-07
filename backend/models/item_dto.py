@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Dict, Optional, Union
 
 from pydantic import BaseModel
 
@@ -11,7 +11,7 @@ class ItemDTO(BaseModel):
     float_value: Optional[float]
 
 
-def item_to_dto(item):
+def item_to_dto(item: Union[Dict[str, Any], Any]) -> ItemDTO:
     if isinstance(item, dict):
         return ItemDTO(
             name=item.get("name"),

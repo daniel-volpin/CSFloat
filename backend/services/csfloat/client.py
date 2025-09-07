@@ -4,7 +4,7 @@ import logging
 import os
 import threading
 import time
-from typing import Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import httpx
 from cachetools import TTLCache
@@ -17,27 +17,28 @@ except Exception:  # pragma: no cover - optional dependency
     _HAS_H2 = False
 
 from ...config.settings import get_settings
+from ...core.exceptions import BackendError, UpstreamServiceError, ValidationError
 from .params import normalize_listings_params
 
 _settings = get_settings()
 
 
 class CSFloatClient:
-    def __init__(self):
-        self.logger = logging.getLogger("csfloat.client")
+    def __init__(self) -> None:
+        self.logger: logging.Logger = logging.getLogger("csfloat.client")
         self._settings = get_settings()
         self._listings_cache: TTLCache = TTLCache(
             maxsize=self._settings.CACHE_MAXSIZE, ttl=self._settings.CACHE_TTL_SECONDS
         )
-        self._cache_lock = threading.Lock()
-        self._inflight: dict[str, threading.Event] = {}
-        self._cache_hits = 0
-        self._cache_misses = 0
-        self.api_key = self._settings.CSFLOAT_API_KEY or os.getenv("CSFLOAT_API_KEY")
-        self.api_url = self._settings.CSFLOAT_API_URL or os.getenv(
+        self._cache_lock: threading.Lock = threading.Lock()
+        self._inflight: Dict[str, threading.Event] = {}
+        self._cache_hits: int = 0
+        self._cache_misses: int = 0
+        self.api_key: Optional[str] = self._settings.CSFLOAT_API_KEY or os.getenv("CSFLOAT_API_KEY")
+        self.api_url: str = self._settings.CSFLOAT_API_URL or os.getenv(
             "CSFLOAT_API_URL", "https://csfloat.com/api/v1/listings"
         )
-        self._http2_enabled = bool(self._settings.HTTP2_ENABLED) and _HAS_H2
+        self._http2_enabled: bool = bool(self._settings.HTTP2_ENABLED) and _HAS_H2
         self._http_client: Optional[httpx.Client] = None
 
     def _create_default_client(self) -> httpx.Client:
@@ -63,7 +64,7 @@ class CSFloatClient:
             self._http_client = self._create_default_client()
         return self._http_client
 
-    def fetch_listings(self, params: dict) -> Tuple[list, str]:
+    def fetch_listings(self, params: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], str]:
         """Fetch listings with a small in-memory TTL cache. Returns (items, cache_status) where cache_status is "HIT" or "MISS"."""
         headers = {"Authorization": self.api_key} if self.api_key else {}
         filtered_params: dict = normalize_listings_params(params)
@@ -118,8 +119,10 @@ class CSFloatClient:
             resp_json = response.json()
             listings = resp_json.get("data", [])
             if not isinstance(listings, list):
-                raise RuntimeError(f"CSFloat API 'data' field is not a list. Response: {resp_json}")
-            items = []
+                raise ValidationError(
+                    f"CSFloat API 'data' field is not a list. Response: {resp_json}"
+                )
+            items: List[Dict[str, Any]] = []
             for listing in listings:
                 item = listing.get("item", {})
                 rarity_raw = item.get("rarity")
@@ -160,6 +163,30 @@ class CSFloatClient:
             with self._cache_lock:
                 self._listings_cache[cache_key] = items
             return items, "MISS"
+        except httpx.HTTPStatusError as e:
+            duration_ms = int((time.perf_counter() - start) * 1000)
+            self.logger.error(
+                json.dumps(
+                    {
+                        "event": "fetch_error",
+                        "key": key_id,
+                        "error": str(e),
+                        "duration_ms": duration_ms,
+                    }
+                )
+            )
+            raise UpstreamServiceError(f"Upstream CSFloat API error: {str(e)}") from e
+        except ValidationError as e:
+            self.logger.error(
+                json.dumps(
+                    {
+                        "event": "validation_error",
+                        "key": key_id,
+                        "error": str(e),
+                    }
+                )
+            )
+            raise
         except Exception as e:
             duration_ms = int((time.perf_counter() - start) * 1000)
             self.logger.error(
@@ -172,14 +199,14 @@ class CSFloatClient:
                     }
                 )
             )
-            raise
+            raise BackendError(f"Unexpected error in fetch_listings: {str(e)}") from e
         finally:
             with self._cache_lock:
                 ev2 = self._inflight.pop(cache_key, None)
                 if ev2 is not None:
                     ev2.set()
 
-    def get_cache_stats(self):
+    def get_cache_stats(self) -> Dict[str, Any]:
         with self._cache_lock:
             return {
                 "size": len(self._listings_cache),
@@ -189,14 +216,14 @@ class CSFloatClient:
                 "ttl_seconds": self._settings.CACHE_TTL_SECONDS,
             }
 
-    def invalidate_cache(self):
+    def invalidate_cache(self) -> None:
         with self._cache_lock:
             self._listings_cache.clear()
             for ev in self._inflight.values():
                 ev.set()
             self._inflight.clear()
 
-    def fetch_item_names(self, limit: int = 50) -> list:
+    def fetch_item_names(self, limit: int = 50) -> List[str]:
         """Fetch item names from CSFloat item-names endpoint."""
         url = self._settings.CSFLOAT_ITEM_NAMES_URL
         headers = {"Authorization": self.api_key} if self.api_key else {}

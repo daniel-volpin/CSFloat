@@ -4,6 +4,7 @@ import os
 from typing import List, Optional
 
 from ...config.settings import get_settings
+from ...core.exceptions import UpstreamServiceError
 from ...models.item_dto import ItemDTO
 from .formatting import build_listings_digest
 from .openai_client import OpenAIClient
@@ -52,8 +53,11 @@ def ask_about_listings(
             return client.chat(
                 model=chosen_model, messages=messages, temperature=0.2, max_tokens=300
             )
-        except Exception:
-            pass
+        except Exception as e:
+            raise UpstreamServiceError(f"LMStudio provider error: {str(e)}") from e
 
-    client = OpenAIClient()
-    return client.chat(model=chosen_model, messages=messages, temperature=0.2, max_tokens=300)
+    try:
+        client = OpenAIClient()
+        return client.chat(model=chosen_model, messages=messages, temperature=0.2, max_tokens=300)
+    except Exception as e:
+        raise UpstreamServiceError(f"OpenAI provider error: {str(e)}") from e
