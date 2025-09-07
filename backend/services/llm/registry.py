@@ -58,14 +58,8 @@ def list_models(ttl_seconds: int = 10) -> List[LLMModelInfo]:
         models: List[LLMModelInfo] = []
         lm_models = _list_lmstudio_downloaded_llms()
         if lm_models:
-            first = lm_models[0]
-            lm_models = [
-                LLMModelInfo(first.provider, first.key, first.display + " — default", True)
-            ] + [LLMModelInfo(m.provider, m.key, m.display, False) for m in lm_models[1:]]
             models.extend(lm_models)
-            models.append(_openai_default_model())
-        else:
-            models.append(_openai_default_model())
+        models.append(_openai_default_model())
         _cache_models = models
-        _cache_expiry = now + max(1, int(ttl_seconds))
+        _cache_expiry = now + ttl_seconds
         return list(models)

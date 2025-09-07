@@ -5,21 +5,23 @@ from backend.services.csfloat.params import normalize_listings_params
 
 class TestNormalizeListingsParams:
     @pytest.mark.parametrize(
-        "params",
+        "params,expected_min,expected_max",
         [
-            {"min_price": 200.0, "max_price": 100.0},
-            {"min_price": "12.34", "max_price": "56.78"},
+            ({"min_price": 200.0, "max_price": 100.0}, 100, 200),  # Should swap
+            ({"min_price": "12.34", "max_price": "56.78"}, 12, 56),  # Should normalize
         ],
     )
-    def test_given_price_params_when_normalize_then_prices_are_dropped(self, params):
+    def test_given_price_params_when_normalize_then_prices_are_swapped_or_normalized(
+        self, params, expected_min, expected_max
+    ):
         # Arrange
 
         # Act
         out = normalize_listings_params(params)
 
         # Assert
-        assert "min_price" not in out
-        assert "max_price" not in out
+        assert out["min_price"] == expected_min
+        assert out["max_price"] == expected_max
 
     @pytest.mark.parametrize(
         "params,expected_min,expected_max",

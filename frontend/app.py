@@ -1,31 +1,77 @@
 import streamlit as st
 from components.listings.render_filter_sidebar import filter_sidebar
+from components.listings.render_listings import render_listings
+from components.listings.render_listings_analysis import render_listing_analysis
 from components.ui.app_main_header_ui import render_header
 from config.settings import APP_SUBTITLE, APP_TITLE
 from dotenv import load_dotenv
-from pages.home import render_home_tab
-from pages.settings import render_settings_tab
+from utils.listings import fetch_and_store_listings
 
 
-def main():
+def main() -> None:
+    """
+    Main entry point for the Streamlit app.
+    """
     load_dotenv()
     render_header(APP_TITLE, subtitle=APP_SUBTITLE)
-    tabs = st.tabs(["Home", "Settings"])
-    with st.sidebar:
-        st.markdown("#### Filters")
     params, filters_submitted = filter_sidebar()
-    params = {k: v for k, v in params.items() if v is not None}
-    if filters_submitted:
-        from utils.session import set_filters_applied
 
-        set_filters_applied(True)
-    with st.sidebar:
-        st.markdown("---")
-        st.caption("Use the filters above to refine your search.")
-    with tabs[0]:
-        render_home_tab(params)
-    with tabs[1]:
-        render_settings_tab()
+    # Persist filter values in session_state
+    if "filters" not in st.session_state:
+        st.session_state["filters"] = {}
+    if "filters_applied" not in st.session_state:
+        st.session_state["filters_applied"] = False
+
+    # Only update filters if user submits the form
+    if filters_submitted:
+        st.session_state["filters"] = params
+        st.session_state["filters_applied"] = True
+        st.rerun()
+
+    # Reset Filters button
+    if st.button("Reset Filters", key="reset_filters"):
+        st.session_state["filters"] = {}
+        st.session_state["filters_applied"] = False
+        st.rerun()
+
+    active_params = st.session_state["filters"] if st.session_state["filters_applied"] else {}
+    st.markdown("")
+
+    import hashlib
+    import json
+
+    def params_hash(params):
+        # Create a hash of the params dict for cache key
+        return hashlib.md5(json.dumps(params, sort_keys=True, default=str).encode()).hexdigest()
+
+    @st.cache_data(show_spinner=False)
+    def cached_fetch_and_store_listings(params, cache_key):
+        return fetch_and_store_listings(params)
+
+    items = None
+    error_message = None
+    cache_key = params_hash(active_params)
+    if st.session_state["filters_applied"]:
+        with st.spinner("Loading listings..."):
+            items, error_message = cached_fetch_and_store_listings(active_params, cache_key)
+
+    col1, col2 = st.columns([1.2, 1.8], gap="large")
+    with col1:
+        st.markdown("<h2 style='margin-bottom:0.5em;'>Listings</h2>", unsafe_allow_html=True)
+        if items:
+            render_listings(items, error_message)
+        else:
+            st.info("Apply filters to see listings.")
+    with col2:
+        st.markdown(
+            "<h2 style='margin-bottom:0.5em;'>Analyze Listings with AI</h2>", unsafe_allow_html=True
+        )
+        # Only show analysis if listings are loaded
+        if items:
+            st.markdown("Analyze the currently loaded listings using AI.")
+            render_listing_analysis(items)
+        else:
+            st.info("Apply filters and load listings to enable analysis.")
 
 
 if __name__ == "__main__":

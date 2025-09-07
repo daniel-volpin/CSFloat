@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     # CSFloat API
     CSFLOAT_API_KEY: str | None = None
     CSFLOAT_API_URL: str = "https://csfloat.com/api/v1/listings"
-    CSFLOAT_ITEM_NAMES_URL: str = "https://api.csfloat.com/api/v1/item-names"
+    CSFLOAT_ITEM_NAMES_URL: str = "https://csfloat.com/api/v1/item-names"
 
     # HTTP client
     REQUEST_CONNECT_TIMEOUT: float = 3.05
@@ -54,7 +54,7 @@ class Settings(BaseSettings):
 
     @field_validator("CORS_ALLOW_ORIGINS", mode="before")
     @classmethod
-    def parse_cors_origins(cls, v):  # type: ignore[override]
+    def parse_cors_origins(cls, v: str | List[str]) -> List[str]:  # type: ignore[override]
         """Allow comma-separated string or JSON list for CORS origins.
 
         Examples:

@@ -5,6 +5,12 @@ from components.ui.item_filter_utils import WIDGET_KEY_PREFIX
 
 
 def render_price_filters() -> Tuple[Optional[float], Optional[float]]:
+    """
+    Render UI for price filters (min and max price in USD).
+
+    Returns:
+        Tuple[Optional[float], Optional[float]]: Minimum and maximum price in USD.
+    """
     st.caption("Enter price in US dollars (e.g., 100 for $100)")
     col1, col2 = st.columns(2)
     min_price_dollars = col1.number_input(

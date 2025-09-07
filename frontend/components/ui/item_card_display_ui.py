@@ -10,7 +10,13 @@ ITEM_FIELDS = {
 }
 
 
-def render_item_card(item: ItemDTO):
+def render_item_card(item: ItemDTO) -> None:
+    """
+    Render a card UI for a single item listing.
+
+    Args:
+        item (ItemDTO): The item data transfer object to display.
+    """
     st.markdown("---")
     if item.price is not None:
         st.write(f"**{ITEM_FIELDS['price']}:** ${item.price / 100:.2f}")

@@ -1,11 +1,22 @@
+from typing import Any, Dict, List, Tuple
+
 from client.backend_client import ApiClientError, fetch_listings
 
 from .session import set_error_message, set_last_items
 
 
-def fetch_and_store_listings(params):
-    items = []
-    error_message = None
+def fetch_and_store_listings(params: Dict[str, Any]) -> Tuple[List[Any], str | None]:
+    """
+    Fetch listings and store them in session, handling errors centrally.
+
+    Args:
+        params: Query parameters for listings API.
+
+    Returns:
+        Tuple of (items, error_message)
+    """
+    items: List[Any] = []
+    error_message: str | None = None
     try:
         items = fetch_listings(params)
         set_error_message(None)

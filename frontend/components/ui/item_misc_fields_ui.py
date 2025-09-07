@@ -5,6 +5,12 @@ from components.ui.item_filter_utils import WIDGET_KEY_PREFIX
 
 
 def render_misc_fields() -> Tuple[Optional[str], Optional[str], Optional[str]]:
+    """
+    Render UI for miscellaneous item fields (market hash name, type, stickers).
+
+    Returns:
+        Tuple[Optional[str], Optional[str], Optional[str]]: Market hash name, type, stickers.
+    """
     market_hash_name = (
         st.text_input("Market Hash Name (manual search)", "", key=f"{WIDGET_KEY_PREFIX}mhn") or None
     )

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -42,14 +42,23 @@ class FilterState(BaseModel):
     max_price: Optional[float] = Field(None, description="Maximum price in USD")
 
     def to_params(
-        self, *, category_map: Dict[str, int], rarity_map: Dict[str, int | None]
-    ) -> Dict[str, object]:
-        """Convert UI state to backend API param dict."""
-        rarity_val = None
+        self, *, category_map: Dict[str, int], rarity_map: Dict[str, Optional[int]]
+    ) -> Dict[str, Any]:
+        """
+        Convert UI state to backend API param dict.
+
+        Args:
+            category_map (Dict[str, int]): Mapping from category name to API category index.
+            rarity_map (Dict[str, Optional[int]]): Mapping from rarity name to API rarity value.
+
+        Returns:
+            Dict[str, Any]: Dictionary of API parameters derived from filter state.
+        """
+        rarity_val: Optional[int] = None
         if self.rarity_selections and len(self.rarity_selections) == 1:
             rarity_val = rarity_map.get(self.rarity_selections[0])
 
-        params: Dict[str, object] = {
+        params: Dict[str, Any] = {
             "cursor": self.cursor or None,
             "limit": int(self.limit),
             "sort_by": self.sort_by,
@@ -66,7 +75,7 @@ class FilterState(BaseModel):
             "type": self.type or None,
             "stickers": self.stickers or None,
             # Send prices in dollars; backend converts to cents for upstream API
-            "min_price": float(self.min_price) if self.min_price else None,
-            "max_price": float(self.max_price) if self.max_price else None,
+            "min_price": float(self.min_price) if self.min_price is not None else None,
+            "max_price": float(self.max_price) if self.max_price is not None else None,
         }
         return params
