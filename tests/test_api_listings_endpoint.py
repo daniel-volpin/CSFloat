@@ -85,5 +85,5 @@ class TestListingsAPI:
 
         # Assert
         assert resp.status_code == 503
-        msg = resp.json().get("message", "").lower()
+        msg = resp.json().get("message", resp.json().get("detail", "")).lower()
         assert "unavailable" in msg

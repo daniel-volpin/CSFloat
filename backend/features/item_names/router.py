@@ -18,7 +18,7 @@ def get_item_names(limit: int = Query(50, ge=1, le=500)) -> ItemNamesResponse:
     try:
         names = csfloat_client.fetch_item_names(limit=limit)
         return ItemNamesResponse(names=names)
-    except UpstreamServiceError as e:
+    except (UpstreamServiceError, RuntimeError) as e:
         raise HTTPException(
             status_code=503, detail=f"Upstream item names service unavailable: {str(e)}"
         )

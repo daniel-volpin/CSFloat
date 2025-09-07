@@ -62,7 +62,7 @@ def get_listings(
         items, cache_status = csfloat_client.fetch_listings(params)
         item_dtos = [item_to_dto(item) for item in items]
         return ListingsResponse(data=item_dtos, meta={"cache": cache_status})
-    except UpstreamServiceError as e:
+    except (UpstreamServiceError, RuntimeError) as e:
         raise HTTPException(
             status_code=503, detail=f"Upstream listings service unavailable: {str(e)}"
         )

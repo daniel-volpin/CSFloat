@@ -15,7 +15,6 @@ def main() -> None:
     load_dotenv()
     render_header(APP_TITLE, subtitle=APP_SUBTITLE)
     params, filters_submitted = filter_sidebar()
-    params = {k: v for k, v in params.items() if v is not None}
 
     # Persist filter values in session_state
     if "filters" not in st.session_state:
@@ -38,15 +37,23 @@ def main() -> None:
     active_params = st.session_state["filters"] if st.session_state["filters_applied"] else {}
     st.markdown("")
 
+    import hashlib
+    import json
+
+    def params_hash(params):
+        # Create a hash of the params dict for cache key
+        return hashlib.md5(json.dumps(params, sort_keys=True, default=str).encode()).hexdigest()
+
     @st.cache_data(show_spinner=False)
-    def cached_fetch_and_store_listings(params):
+    def cached_fetch_and_store_listings(params, cache_key):
         return fetch_and_store_listings(params)
 
     items = None
     error_message = None
+    cache_key = params_hash(active_params)
     if st.session_state["filters_applied"]:
         with st.spinner("Loading listings..."):
-            items, error_message = cached_fetch_and_store_listings(active_params)
+            items, error_message = cached_fetch_and_store_listings(active_params, cache_key)
 
     col1, col2 = st.columns([1.2, 1.8], gap="large")
     with col1:

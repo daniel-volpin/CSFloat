@@ -59,7 +59,7 @@ def render_listings(
                     <div style='background:#23272f;padding:24px 24px 28px 24px;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,0.08);margin-bottom:22px; border: 2px solid #3b82f6; min-width: 280px; min-height: 120px; color: #f3f4f6;'>
                         <div style='display:flex;align-items:center;margin-bottom:10px;'>
                             <span style='font-size:1.08em;font-weight:500;min-width:70px;'>Price:</span>
-                            <span style='font-size:1.3em;font-weight:700;color:#4ADE80;margin-left:10px;'>${item.price:.2f}</span>
+                                <span style='font-size:1.3em;font-weight:700;color:#4ADE80;margin-left:10px;'>${item.price / 100:.2f}</span>
                         </div>
                         <div style='display:flex;align-items:center;margin-bottom:10px;'>
                             <span style='font-size:1.08em;font-weight:500;min-width:70px;'>Name:</span>

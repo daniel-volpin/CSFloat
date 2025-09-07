@@ -120,7 +120,9 @@ def fetch_listings(params: Dict[str, Any]) -> List[ItemDTO]:
     Fetch listings from backend and return as ItemDTO list.
     """
     start = time.time()
-    data = _request_json("GET", LISTINGS_ENDPOINT, params=params, error_cls=ApiClientError)
+    # Remove keys with None values before making the request
+    clean_params = {k: v for k, v in params.items() if v is not None}
+    data = _request_json("GET", LISTINGS_ENDPOINT, params=clean_params, error_cls=ApiClientError)
 
     items_raw = data.get("data")
     if not isinstance(items_raw, list):
