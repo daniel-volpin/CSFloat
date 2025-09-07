@@ -7,7 +7,7 @@ class ItemDTO(BaseModel):
     name: Optional[str]
     price: Optional[int]
     wear: Optional[str]
-    rarity: Optional[int]
+    rarity: Optional[str]
     float_value: Optional[float]
 
 
@@ -38,13 +38,13 @@ class ListingQueryParams(BaseModel):
     def_index: Optional[List[int]] = None
     min_float: Optional[float] = None
     max_float: Optional[float] = None
-    rarity: Optional[str] = None
+    rarity: Optional[int] = None
     paint_seed: Optional[List[int]] = None
     paint_index: Optional[int] = None
     user_id: Optional[str] = None
     collection: Optional[str] = None
-    min_price: Optional[int] = None
-    max_price: Optional[int] = None
+    min_price: Optional[float] = None
+    max_price: Optional[float] = None
     market_hash_name: Optional[str] = None
     item_name: Optional[str] = None
     type: Optional[str] = None
