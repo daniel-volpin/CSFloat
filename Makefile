@@ -18,8 +18,8 @@ install:
 	pip install -r backend/requirements.txt -r frontend/requirements.txt
 
 dev-install:
-	# Core dev tooling
-	pip install pre-commit black ruff flake8 isort autoflake mypy
+	# Core dev + test tooling
+	pip install -r requirements-dev.txt
 	# Install git hook managed by pre-commit
 	pre-commit install
 

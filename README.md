@@ -18,6 +18,10 @@ Discover and filter CS:GO/CS2 item listings with a Streamlit UI and a FastAPI ba
 - [Features](#features)
 - [Getting Started](#getting-started)
 - [Running](#running)
+- [Testing](#testing)
+- [Configuration](#configuration)
+- [Project Structure](#project-structure)
+- [Development](#development)
 - [API](#api-reference)
 - [Troubleshooting](#troubleshooting)
 
@@ -33,22 +37,31 @@ Two-tier app: Streamlit frontend calls a small FastAPI service that standardizes
 
 ## Getting Started
 
-Single conda env for both backend and frontend.
+Quick, minimal setup (Python 3.11):
+
+Prerequisites:
+
+- Python 3.11 and pip
+- Optional: Conda (for managing the env)
+- Optional: GNU Make (for convenience targets)
 
 ```bash
-# Create env
-conda create -n csfloat python=3.11 -y
-conda activate csfloat
+# Create and activate env (conda example)
+conda create -n csfloat python=3.11 -y && conda activate csfloat
 
-# Install deps
-pip install -r backend/requirements.txt
-pip install -r frontend/requirements.txt
+# Install runtime deps (backend + frontend)
+make install
 
-# Backend env (backend/.env)
-printf "CSFLOAT_API_KEY=your_csfloat_key\nOPENAI_API_KEY=your_openai_key\n" > backend/.env
+# Optional: dev/test tooling
+make dev-install
 
-# Frontend env (frontend/.env)
-printf "API_BASE_URL=http://localhost:8000\n" > frontend/.env
+# No make? Use pip instead
+pip install -r backend/requirements.txt -r frontend/requirements.txt
+pip install -r requirements-dev.txt && pre-commit install
+
+# Configure env files (copy examples and edit as needed)
+cp backend/.env.example backend/.env   # set CSFLOAT/OPENAI keys
+cp frontend/.env.example frontend/.env # API_BASE_URL defaults to http://localhost:8000
 ```
 
 ## Running
@@ -71,18 +84,43 @@ Non-dev CORS configuration:
 
   By default in dev, CORS is open (`*`).
 
-## Development
+## Testing
 
-Set up dev tooling and git hooks (Black, Ruff, Isort, Autoflake, Flake8, Mypy) using the Makefile:
+Run tests from the repo root (no external services required):
 
 ```bash
-make dev-install
+pytest -q
 ```
 
-Tips:
+CI runs lint, type-checks, and tests on every push/PR.
 
-- Update hooks to latest: `pre-commit autoupdate`
-- Run checks manually: `pre-commit run --all-files`
+## Configuration
+
+- backend/.env
+  - `CSFLOAT_API_KEY`: CSFloat API key (required for listings and item-names)
+  - `OPENAI_API_KEY`: OpenAI key (required only for AI analysis)
+  - `CORS_ALLOW_ORIGINS`: Comma-separated or JSON list of allowed origins (default `*`)
+  - `CORS_ALLOW_CREDENTIALS`: `true/false` for credentials (default `true`)
+- frontend/.env
+  - `API_BASE_URL`: Defaults to `http://localhost:8000`
+
+Note: AI analysis is optional. If `OPENAI_API_KEY` is not set, the rest of the app still works.
+
+## Project Structure
+
+```
+backend/   # FastAPI service (routes, services, config)
+frontend/  # Streamlit app (UI, client, models)
+tests/     # Pytest suite (unit + API)
+Makefile   # Common tasks (install, dev-install, run)
+requirements-dev.txt  # Dev/test tooling
+```
+
+## Development
+
+- Install dev tooling: `make dev-install`
+- Update hooks: `pre-commit autoupdate`
+- Run all checks locally: `pre-commit run --all-files`
 
 ## API Reference
 
