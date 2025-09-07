@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Dict, List, Optional
 
 import streamlit as st
 from client.backend_client import ApiClientError, fetch_listings
@@ -6,9 +6,17 @@ from components.ui.item_card_display_ui import render_item_card
 
 
 @st.cache_data
-def get_cached_listings(params):
+def get_cached_listings(params: Optional[Dict[str, Any]]) -> List[Any]:
+    """
+    Fetch and cache listings from backend, handling errors centrally.
+    Args:
+        params: Query parameters for listings API.
+    Returns:
+        List of items.
+    """
     try:
-        return fetch_listings(params)
+        safe_params = params if params is not None else {}
+        return fetch_listings(safe_params)
     except ApiClientError as e:
         st.error(e.user_message)
         return []
@@ -19,7 +27,9 @@ def get_cached_listings(params):
         return []
 
 
-def render_listings(params: Optional[dict] = None, error_message: Optional[str] = None):
+def render_listings(
+    params: Optional[Dict[str, Any]] = None, error_message: Optional[str] = None
+) -> None:
     """
     Display listings and handle error/success feedback.
     Args:

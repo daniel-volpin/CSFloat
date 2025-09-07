@@ -4,6 +4,10 @@ from pydantic import BaseModel, Field
 
 
 class ItemDTO(BaseModel):
+    """
+    Data Transfer Object for item listings.
+    """
+
     name: Optional[str] = Field(None, description="Name of the item")
     price: Optional[int] = Field(None, description="Price of the item in cents")
     wear: Optional[str] = Field(None, description="Wear level or condition of the item")
@@ -12,6 +16,15 @@ class ItemDTO(BaseModel):
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "ItemDTO":
+        """
+        Create an ItemDTO from a dictionary.
+
+        Args:
+            data: Dictionary containing item data.
+
+        Returns:
+            ItemDTO instance.
+        """
         name = data.get("item_name") or data.get("name")
         price = data.get("price")
         wear = data.get("wear_name") or data.get("wear")

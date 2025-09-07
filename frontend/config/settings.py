@@ -1,23 +1,24 @@
 import os
+from typing import Dict, List, Optional, Tuple
 
 from dotenv import load_dotenv
 
 # Ensure .env is loaded before reading env vars
 load_dotenv()
 
-API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
-LISTINGS_ENDPOINT = f"{API_BASE_URL}/api/listings"
+API_BASE_URL: str = os.getenv("API_BASE_URL", "http://localhost:8000")
+LISTINGS_ENDPOINT: str = f"{API_BASE_URL}/api/listings"
 
 # UI settings
-APP_TITLE = "CSFloat Listings"
-APP_SUBTITLE = "Find and filter your favorite items"
+APP_TITLE: str = "CSFloat Listings"
+APP_SUBTITLE: str = "Find and filter your favorite items"
 
 # Filter defaults
-DEFAULT_LIMIT = 10
-DEFAULT_FLOAT_RANGE = (0.0, 1.0)
+DEFAULT_LIMIT: int = 10
+DEFAULT_FLOAT_RANGE: Tuple[float, float] = (0.0, 1.0)
 # Default index in SORT_OPTIONS for UI ("best_deal")
-DEFAULT_SORT_INDEX = 6
-RARITY_OPTIONS = [
+DEFAULT_SORT_INDEX: int = 6
+RARITY_OPTIONS: List[str] = [
     "",
     "Common",
     "Uncommon",
@@ -29,7 +30,7 @@ RARITY_OPTIONS = [
 ]
 
 # Centralized rarity mapping for API use
-RARITY_MAP = {
+RARITY_MAP: Dict[str, Optional[int]] = {
     "": None,
     "Common": 1,
     "Uncommon": 2,
@@ -39,9 +40,9 @@ RARITY_MAP = {
     "Ancient": 6,
     "Immortal": 7,
 }
-CATEGORY_OPTIONS = ["Any", "Normal", "StatTrak", "Souvenir"]
-CATEGORY_MAP = {"Any": 0, "Normal": 1, "StatTrak": 2, "Souvenir": 3}
-SORT_OPTIONS = [
+CATEGORY_OPTIONS: List[str] = ["Any", "Normal", "StatTrak", "Souvenir"]
+CATEGORY_MAP: Dict[str, int] = {"Any": 0, "Normal": 1, "StatTrak": 2, "Souvenir": 3}
+SORT_OPTIONS: List[str] = [
     "lowest_price",
     "highest_price",
     "most_recent",

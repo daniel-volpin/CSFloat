@@ -1,3 +1,5 @@
+from typing import Any
+
 import streamlit as st
 from components.listings.render_listings import render_listings
 from utils.dialogs import show_analysis_fallback, show_analysis_modal
@@ -5,7 +7,13 @@ from utils.listings import fetch_and_store_listings
 from utils.session import get_analysis_fallback, get_error_message, get_last_items
 
 
-def render_home_tab(params):
+def render_home_tab(params: Any) -> None:
+    """
+    Render the home tab UI, including listings and analysis.
+
+    Args:
+        params: Query/filter parameters for listings.
+    """
     st.markdown("---")
     items = get_last_items()
     error_message = get_error_message()

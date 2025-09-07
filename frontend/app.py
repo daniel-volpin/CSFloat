@@ -7,7 +7,10 @@ from pages.home import render_home_tab
 from pages.settings import render_settings_tab
 
 
-def main():
+def main() -> None:
+    """
+    Main entry point for the Streamlit app.
+    """
     load_dotenv()
     render_header(APP_TITLE, subtitle=APP_SUBTITLE)
     tabs = st.tabs(["Home", "Settings"])

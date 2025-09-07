@@ -7,6 +7,12 @@ from components.ui.item_filter_utils import WIDGET_KEY_PREFIX, parse_csv_ints
 def render_item_details() -> (
     Tuple[Optional[List[int]], Optional[int], Optional[str], Optional[str]]
 ):
+    """
+    Render UI fields for item details and return their values.
+
+    Returns:
+        Tuple[Optional[List[int]], Optional[int], Optional[str], Optional[str]]: Paint seeds, paint index, user ID, and collection name.
+    """
     paint_seed_input = st.text_input(
         "Paint Seed (comma separated)", "", key=f"{WIDGET_KEY_PREFIX}paint_seed"
     )

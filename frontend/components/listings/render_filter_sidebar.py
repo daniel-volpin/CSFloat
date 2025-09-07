@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Tuple
+from typing import Any, Dict, Tuple
 
 import streamlit as st
 from components.ui.item_details_fields_ui import render_item_details
@@ -12,7 +12,7 @@ from config.settings import CATEGORY_MAP, RARITY_MAP
 from models.filter_models import FilterState
 
 
-def filter_sidebar() -> Tuple[Dict[str, object], bool]:
+def filter_sidebar() -> Tuple[Dict[str, Any], bool]:
     """Render the filter sidebar as a single form.
 
     Returns:

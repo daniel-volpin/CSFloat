@@ -6,6 +6,12 @@ from config.settings import CATEGORY_OPTIONS, DEFAULT_LIMIT, DEFAULT_SORT_INDEX,
 
 
 def render_basic_filters() -> Tuple[str, int, str, str, Optional[List[int]]]:
+    """
+    Render UI for basic listing filters (cursor, limit, sort, category, def_index).
+
+    Returns:
+        Tuple[str, int, str, str, Optional[List[int]]]: Cursor, limit, sort_by, category, def_index.
+    """
     cursor = st.text_input("Cursor", "", key=f"{WIDGET_KEY_PREFIX}cursor")
     limit = st.slider("Limit", 1, 50, DEFAULT_LIMIT, key=f"{WIDGET_KEY_PREFIX}limit")
     sort_by = st.selectbox(

@@ -1,5 +1,5 @@
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Type
 
 import httpx
 from config.settings import API_BASE_URL, LISTINGS_ENDPOINT
@@ -11,6 +11,14 @@ _client = httpx.Client(
 
 
 class ApiClientError(Exception):
+    """
+    Exception for API client errors.
+    Args:
+        user_message: User-friendly error message.
+        status_code: Optional HTTP status code.
+        detail: Optional technical detail.
+    """
+
     def __init__(
         self,
         user_message: str,
@@ -25,10 +33,15 @@ class ApiClientError(Exception):
 
 
 class BackendApiError(ApiClientError):
+    """Exception for backend API errors."""
+
     pass
 
 
 def _map_http_error(status: int, payload: Dict[str, Any] | None) -> ApiClientError:
+    """
+    Map HTTP status and payload to a user-friendly ApiClientError.
+    """
     server_msg = None
     if isinstance(payload, dict):
         server_msg = payload.get("message") or payload.get("detail")
@@ -60,8 +73,11 @@ def _request_json(
     *,
     params: Dict[str, Any] | None = None,
     json: Any | None = None,
-    error_cls=ApiClientError,
+    error_cls: Type[ApiClientError] = ApiClientError,
 ) -> Dict[str, Any]:
+    """
+    Make an HTTP request and return JSON response, raising error_cls on failure.
+    """
     try:
         resp = _client.request(method, url, params=params, json=json)
         payload: Dict[str, Any] | None = None
@@ -71,7 +87,7 @@ def _request_json(
             payload = None
 
         if not (200 <= resp.status_code < 300):
-            raise (error_cls if error_cls is not None else ApiClientError)(
+            raise error_cls(
                 (_map_http_error(resp.status_code, payload).user_message),
                 status_code=resp.status_code,
                 detail=str(payload),
@@ -91,6 +107,9 @@ def _request_json(
 
 
 def _merge_item(entry: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Merge item dict from API response into a flat dict.
+    """
     merged: Dict[str, Any] = {}
     if "item" in entry and isinstance(entry["item"], dict):
         merged.update(entry["item"])
@@ -99,6 +118,9 @@ def _merge_item(entry: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def fetch_listings(params: Dict[str, Any]) -> List[ItemDTO]:
+    """
+    Fetch listings from backend and return as ItemDTO list.
+    """
     start = time.time()
     data = _request_json("GET", LISTINGS_ENDPOINT, params=params, error_cls=ApiClientError)
 
@@ -118,12 +140,17 @@ def fetch_listings(params: Dict[str, Any]) -> List[ItemDTO]:
 
 
 class BackendClient:
-    """Client for backend analysis and listings."""
+    """
+    Client for backend analysis and listings.
+    """
 
     def __init__(self, base_url: Optional[str] = None):
         self.base_url = base_url or API_BASE_URL
 
     def fetch_listings(self, params: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """
+        Fetch listings from backend API.
+        """
         data = _request_json(
             "GET", f"{self.base_url}/api/listings", params=params, error_cls=BackendApiError
         )
@@ -131,6 +158,9 @@ class BackendClient:
         return results if isinstance(results, list) else []
 
     def list_llm_models(self) -> List[Dict[str, Any]]:
+        """
+        List available LLM models from backend.
+        """
         data = _request_json("GET", f"{self.base_url}/llm/models", error_cls=BackendApiError)
         models = data.get("models")
         return models if isinstance(models, list) else []
@@ -142,6 +172,9 @@ class BackendClient:
         model: Optional[str] = None,
         max_items: int = 50,
     ) -> str:
+        """
+        Analyze listings with AI via backend.
+        """
         serializable_items = [item.dict() if hasattr(item, "dict") else item for item in items]
         payload = {
             "question": question,

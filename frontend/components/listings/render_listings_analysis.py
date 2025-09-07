@@ -1,10 +1,12 @@
-from typing import List, Optional
+from typing import Any, List, Optional
 
 import streamlit as st
 from client.backend_client import BackendApiError, BackendClient
 
 
-def render_listing_analysis(items: Optional[List], default_model: Optional[str] = None):
+def render_listing_analysis(
+    items: Optional[List[Any]], default_model: Optional[str] = None
+) -> None:
     """
     Display AI-powered analysis interface for listings.
     Args:
