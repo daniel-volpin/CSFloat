@@ -29,7 +29,6 @@ def analyze_listings(payload: AnalyzeRequest = Body(...)):
         )
         return {"result": result}
     except AuthenticationError:
-        # Map provider auth failures to 401 Unauthorized
         raise HTTPException(
             status_code=401,
             detail=(

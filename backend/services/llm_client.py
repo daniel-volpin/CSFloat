@@ -30,22 +30,16 @@ def ask_about_listings(
         return "No listings are loaded. Adjust filters and try again."
     settings = get_settings()
 
-    # Provider selection: explicit prefix wins, then env/settings, default OpenAI
     provider_override = os.getenv("LLM_PROVIDER") or settings.LLM_PROVIDER or "openai"
     chosen_provider = provider_override.strip().lower()
     chosen_model = (model or "").strip()
-
-    # Allow model prefixes to force provider: "lmstudio:..." or "openai:..."
     if chosen_model.lower().startswith("lmstudio:"):
         chosen_provider = "lmstudio"
         chosen_model = chosen_model.split(":", 1)[1].strip()
     elif chosen_model.lower().startswith("openai:"):
         chosen_provider = "openai"
         chosen_model = chosen_model.split(":", 1)[1].strip()
-
-    # Apply provider-specific default models if none provided
     if not chosen_model:
-        # Prefer LM Studio if available (auto-detect via SDK); otherwise fallback to OpenAI
         try:
             available = list_models()
             first = available[0] if available else None
@@ -84,7 +78,6 @@ def ask_about_listings(
         {"role": "system", "content": system},
         {"role": "user", "content": user},
     ]
-    # Route to desired provider with LM Studio preferred; fallback to OpenAI
     if chosen_provider == "lmstudio":
         try:
             client = LMStudioClient()

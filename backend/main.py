@@ -13,7 +13,6 @@ from .services.csfloat_client import set_http_client
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Create shared HTTP client for upstream requests
     settings = get_settings()
     http2_enabled = bool(settings.HTTP2_ENABLED)
     try:
@@ -46,7 +45,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-# Configure CORS via settings (dev-open by default)
 _settings = get_settings()
 app.add_middleware(
     CORSMiddleware,
@@ -59,7 +57,6 @@ app.add_middleware(
 app.include_router(router, prefix="/api")
 
 
-# Consistent error JSON across the API
 @app.exception_handler(HTTPException)
 async def http_exception_handler(_, exc: HTTPException):
     return JSONResponse(
