@@ -1,16 +1,25 @@
 from typing import Optional
 
 import streamlit as st
-from client.backend_client import fetch_listings
+from client.backend_client import ApiClientError, fetch_listings
 from components.ui.item_card import render_item_card
 
 
 @st.cache_data
 def get_cached_listings(params):
-    return fetch_listings(params)
+    try:
+        return fetch_listings(params)
+    except ApiClientError as e:
+        st.error(e.user_message)
+        return []
+    except Exception:
+        st.error(
+            "Unable to connect to backend service. Please ensure the backend server is running and reachable."
+        )
+        return []
 
 
-def display_listings(params: Optional[dict] = None, error_message: Optional[str] = None):
+def render_listings(params: Optional[dict] = None, error_message: Optional[str] = None):
     """
     Display listings and handle error/success feedback.
     Args:

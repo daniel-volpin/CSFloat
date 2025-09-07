@@ -108,6 +108,7 @@ CI runs lint, type-checks, and tests on every push/PR.
   - `API_BASE_URL`: Defaults to `http://localhost:8000`
 
 Notes:
+
 - AI analysis is optional. If using OpenAI, set `OPENAI_API_KEY`.
 - To use LM Studio, install the SDK (`pip install lmstudio`) and run the LM Studio app with the Developer API enabled. The backend will auto-detect the local server or use `LMSTUDIO_API_HOST`.
   - You can also force the provider from the UI by prefixing the model in the analysis panel:
