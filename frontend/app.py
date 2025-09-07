@@ -26,6 +26,12 @@ def main() -> None:
         st.session_state["filters"] = params
         st.session_state["filters_applied"] = True
 
+    # Reset Filters button
+    if st.button("Reset Filters", key="reset_filters"):
+        st.session_state["filters"] = {}
+        st.session_state["filters_applied"] = False
+        st.rerun()
+
     active_params = st.session_state["filters"] if st.session_state["filters_applied"] else {}
     st.markdown("")
     items = None
@@ -44,7 +50,14 @@ def main() -> None:
         st.markdown(
             "<h2 style='margin-bottom:0.5em;'>Analyze Listings with AI</h2>", unsafe_allow_html=True
         )
-        render_listing_analysis(items if items else [])
+        # Only show analysis if listings are loaded
+        if items:
+            with st.expander("Show Analysis", expanded=True):
+                st.markdown("Analyze the currently loaded listings using AI.")
+                render_listing_analysis(items)
+        else:
+            with st.expander("Show Analysis", expanded=False):
+                st.info("Apply filters and load listings to enable analysis.")
 
 
 if __name__ == "__main__":
