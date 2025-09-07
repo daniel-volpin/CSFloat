@@ -7,7 +7,7 @@ class ItemDTO(BaseModel):
     name: Optional[str]
     price: Optional[int]
     wear: Optional[str]
-    rarity: Optional[str]
+    rarity: Optional[int]
     float_value: Optional[float]
 
 

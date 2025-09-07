@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional
 
 import requests
 
-DEFAULT_TIMEOUT = (3.05, 15)
+DEFAULT_TIMEOUT = (1.0, 5)
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
 
 

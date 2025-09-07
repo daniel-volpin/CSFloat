@@ -2,13 +2,12 @@ import time
 from typing import Any, Dict, List
 
 import requests
-from config.settings import ITEM_NAMES_ENDPOINT, LISTINGS_ENDPOINT
+from config.settings import LISTINGS_ENDPOINT
 from models.listing_models import ItemDTO
 
 DEFAULT_TIMEOUT = (3.05, 10)
 
 
-# Lightweight client-side error types with user-friendly messages
 class ApiClientError(Exception):
     def __init__(
         self,
@@ -26,7 +25,6 @@ class ApiClientError(Exception):
 def _map_http_error(status: int, payload: Dict[str, Any] | None) -> ApiClientError:
     server_msg = None
     if isinstance(payload, dict):
-        # Backend returns {"error": ..., "message": ...}
         server_msg = payload.get("message") or payload.get("detail")
 
     messages = {
@@ -59,7 +57,6 @@ def _request_json(
 ) -> Dict[str, Any]:
     try:
         resp = requests.request(method, url, params=params, json=json, timeout=DEFAULT_TIMEOUT)
-        # Attempt to parse JSON payload early for richer errors
         payload: Dict[str, Any] | None = None
         try:
             payload = resp.json()
@@ -104,15 +101,3 @@ def fetch_listings(params: Dict[str, Any]) -> List[ItemDTO]:
     else:
         print(f"[Cache] Fetching listings from API... ({elapsed:.2f}s)")
     return listings
-
-
-def fetch_item_names(limit: int = 50) -> list[str]:
-    try:
-        data = _request_json("GET", ITEM_NAMES_ENDPOINT, params={"limit": limit})
-        names = data.get("names") if isinstance(data, dict) else None
-        if not isinstance(names, list):
-            return []
-        return [str(n) for n in names if isinstance(n, str) and n.strip()]
-    except ApiClientError:
-        # Silently degrade in the UI (filters can work without names)
-        return []
