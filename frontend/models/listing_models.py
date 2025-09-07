@@ -1,14 +1,14 @@
 from typing import Any, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ItemDTO(BaseModel):
-    name: Optional[str]
-    price: Optional[int]
-    wear: Optional[str]
-    rarity: Optional[str]
-    float_value: Optional[float]
+    name: Optional[str] = Field(None, description="Name of the item")
+    price: Optional[int] = Field(None, description="Price of the item in cents")
+    wear: Optional[str] = Field(None, description="Wear level or condition of the item")
+    rarity: Optional[str] = Field(None, description="Rarity classification of the item")
+    float_value: Optional[float] = Field(None, description="Float value indicating item quality")
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "ItemDTO":

@@ -10,7 +10,7 @@
 
 [Demo](#running) • [Docs](#api-reference) • [Issues](../../issues) • [PRs](../../pulls)
 
-Discover and filter CS:GO/CS2 item listings with a Streamlit UI and a FastAPI backend. Optional AI analysis runs server-side.
+Discover and filter CS:GO/CS2 item listings with a Streamlit UI and a FastAPI backend. Optional AI analysis runs server-side using OpenAI or a local LM Studio model.
 
 ## Table of Contents
 
@@ -32,7 +32,7 @@ Two-tier app: Streamlit frontend calls a small FastAPI service that standardizes
 ## Features
 
 - Filter listings by price, float, rarity, and more.
-- AI insights over the currently loaded items (backend-only OpenAI).
+- AI insights over the currently loaded items (OpenAI or LM Studio).
 - Consistent error JSON and friendly UI messages.
 
 ## Getting Started
@@ -98,13 +98,22 @@ CI runs lint, type-checks, and tests on every push/PR.
 
 - backend/.env
   - `CSFLOAT_API_KEY`: CSFloat API key (required for listings and item-names)
-  - `OPENAI_API_KEY`: OpenAI key (required only for AI analysis)
-  - `CORS_ALLOW_ORIGINS`: Comma-separated or JSON list of allowed origins (default `*`)
-  - `CORS_ALLOW_CREDENTIALS`: `true/false` for credentials (default `true`)
-- frontend/.env
+  - `OPENAI_API_KEY`: OpenAI key (required for OpenAI analysis)
+  - `OPENAI_BASE_URL`: Optional override for OpenAI-compatible servers
+  - `OPENAI_MODEL`: Default OpenAI model (e.g., `gpt-4o-mini`)
+  - `LLM_PROVIDER`: `openai` (default) or `lmstudio`
+  - `LMSTUDIO_API_HOST`: Optional LM Studio API host (auto-detected by default)
+  - `LMSTUDIO_MODEL`: Default local model key (e.g., `qwen/qwen3-8b`)
+  - frontend/.env
   - `API_BASE_URL`: Defaults to `http://localhost:8000`
 
-Note: AI analysis is optional. If `OPENAI_API_KEY` is not set, the rest of the app still works.
+Notes:
+
+- AI analysis is optional. If using OpenAI, set `OPENAI_API_KEY`.
+- To use LM Studio, install the SDK (`pip install lmstudio`) and run the LM Studio app with the Developer API enabled. The backend will auto-detect the local server or use `LMSTUDIO_API_HOST`.
+  - You can also force the provider from the UI by prefixing the model in the analysis panel:
+    - `openai:gpt-4o-mini` (forces OpenAI)
+    - `lmstudio:qwen/qwen3-8b` (forces LM Studio and uses the local model key)
 
 ## Project Structure
 
