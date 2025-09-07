@@ -27,6 +27,13 @@ class Settings(BaseSettings):
     OPENAI_BASE_URL: str | None = None
     OPENAI_MODEL: str = "gpt-4o-mini"
 
+    # LLM provider selection
+    # Values: "openai" (default), "lmstudio"
+    LLM_PROVIDER: str = "openai"
+    # Optional LM Studio overrides
+    LMSTUDIO_API_HOST: str | None = None
+    LMSTUDIO_MODEL: str | None = None
+
     # HTTPX client tuning
     HTTP2_ENABLED: bool = True
     HTTPX_MAX_KEEPALIVE: int = 20

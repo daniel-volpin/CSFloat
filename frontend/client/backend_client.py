@@ -130,6 +130,11 @@ class BackendClient:
         results = data.get("data")
         return results if isinstance(results, list) else []
 
+    def list_llm_models(self) -> List[Dict[str, Any]]:
+        data = _request_json("GET", f"{self.base_url}/api/llm/models", error_cls=BackendApiError)
+        models = data.get("models")
+        return models if isinstance(models, list) else []
+
     def analyze_listings(
         self,
         question: str,

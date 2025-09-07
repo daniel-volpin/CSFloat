@@ -26,6 +26,10 @@ try:
     from .cache import router as cache_router
 
     router.include_router(cache_router)
+
+    from .models import router as models_router
+
+    router.include_router(models_router)
 except Exception:  # pragma: no cover - avoid import errors at startup
     # If subrouter import fails (e.g., during incomplete refactors), keep API up.
     pass

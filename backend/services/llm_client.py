@@ -3,6 +3,8 @@ from typing import List, Optional
 
 from ..config.settings import get_settings
 from ..models.models import ItemDTO
+from .llm_registry import list_models
+from .lmstudio_client import LMStudioClient
 from .openai_client import OpenAIClient
 
 
@@ -26,9 +28,41 @@ def ask_about_listings(
 ) -> str:
     if not items:
         return "No listings are loaded. Adjust filters and try again."
-    client = OpenAIClient()
     settings = get_settings()
-    chosen_model = model or settings.OPENAI_MODEL or os.getenv("OPENAI_MODEL") or "gpt-4o-mini"
+
+    # Provider selection: explicit prefix wins, then env/settings, default OpenAI
+    provider_override = os.getenv("LLM_PROVIDER") or settings.LLM_PROVIDER or "openai"
+    chosen_provider = provider_override.strip().lower()
+    chosen_model = (model or "").strip()
+
+    # Allow model prefixes to force provider: "lmstudio:..." or "openai:..."
+    if chosen_model.lower().startswith("lmstudio:"):
+        chosen_provider = "lmstudio"
+        chosen_model = chosen_model.split(":", 1)[1].strip()
+    elif chosen_model.lower().startswith("openai:"):
+        chosen_provider = "openai"
+        chosen_model = chosen_model.split(":", 1)[1].strip()
+
+    # Apply provider-specific default models if none provided
+    if not chosen_model:
+        # Prefer LM Studio if available (auto-detect via SDK); otherwise fallback to OpenAI
+        try:
+            available = list_models()
+            first = available[0] if available else None
+            if first and first.provider == "lmstudio":
+                chosen_provider = "lmstudio"
+                chosen_model = (
+                    settings.LMSTUDIO_MODEL
+                    or os.getenv("LMSTUDIO_MODEL")
+                    or first.key
+                    or "qwen/qwen3-8b"
+                )
+            else:
+                chosen_provider = "openai"
+                chosen_model = settings.OPENAI_MODEL or os.getenv("OPENAI_MODEL") or "gpt-4o-mini"
+        except Exception:
+            chosen_provider = "openai"
+            chosen_model = settings.OPENAI_MODEL or os.getenv("OPENAI_MODEL") or "gpt-4o-mini"
     reduced_items = max_items
     if "gpt-5-nano" in chosen_model.lower():
         reduced_items = min(max_items, 10)
@@ -50,4 +84,14 @@ def ask_about_listings(
         {"role": "system", "content": system},
         {"role": "user", "content": user},
     ]
+    # Route to desired provider with LM Studio preferred; fallback to OpenAI
+    if chosen_provider == "lmstudio":
+        try:
+            client = LMStudioClient()
+            return client.chat(
+                model=chosen_model, messages=messages, temperature=0.2, max_tokens=300
+            )
+        except Exception:
+            pass
+    client = OpenAIClient()
     return client.chat(model=chosen_model, messages=messages, temperature=0.2, max_tokens=300)
