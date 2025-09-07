@@ -1,6 +1,9 @@
+import hashlib
 import json
+import logging
 import os
 import threading
+import time
 from typing import List, Optional, Tuple
 
 import httpx
@@ -8,6 +11,7 @@ from cachetools import TTLCache
 
 # Optional HTTP/2 support detection for httpx
 try:
+    import h2  # type: ignore  # noqa: F401
 
     _HAS_H2 = True
 except Exception:  # pragma: no cover - optional dependency
@@ -18,6 +22,7 @@ from ..models.models import ItemDTO
 from .csfloat_params import normalize_listings_params
 
 _settings = get_settings()
+logger = logging.getLogger("csfloat.client")
 
 # Global cache for listings
 _listings_cache: TTLCache = TTLCache(
@@ -83,6 +88,7 @@ def fetch_csfloat_listings(params: dict) -> Tuple[List[ItemDTO], str]:
         cache_key = json.dumps(filtered_params, sort_keys=True, separators=(",", ":"))
     except Exception:
         cache_key = str(sorted(filtered_params.items()))
+    key_id = hashlib.sha1(cache_key.encode("utf-8")).hexdigest()[:8]
 
     # Single-flight: avoid dogpile
     wait_seconds = float(_settings.SINGLE_FLIGHT_WAIT_SECONDS)
@@ -91,6 +97,16 @@ def fetch_csfloat_listings(params: dict) -> Tuple[List[ItemDTO], str]:
             global _cache_hits, _cache_misses
             if cache_key in _listings_cache:
                 _cache_hits += 1
+                logger.info(
+                    json.dumps(
+                        {
+                            "event": "cache_hit",
+                            "key": key_id,
+                            "hits": _cache_hits,
+                            "misses": _cache_misses,
+                        }
+                    )
+                )
                 return _listings_cache[cache_key], "HIT"
             ev = _inflight.get(cache_key)
             if ev is None:
@@ -98,12 +114,32 @@ def fetch_csfloat_listings(params: dict) -> Tuple[List[ItemDTO], str]:
                 _inflight[cache_key] = ev
                 # This caller becomes the fetcher
                 _cache_misses += 1
+                logger.info(
+                    json.dumps(
+                        {
+                            "event": "cache_miss_leader",
+                            "key": key_id,
+                            "hits": _cache_hits,
+                            "misses": _cache_misses,
+                        }
+                    )
+                )
                 break
         # Another fetch already in-flight; wait briefly then re-check
+        logger.info(
+            json.dumps(
+                {
+                    "event": "cache_wait",
+                    "key": key_id,
+                    "wait_seconds": wait_seconds,
+                }
+            )
+        )
         ev.wait(timeout=wait_seconds)
         # loop to re-check cache or become fetcher if prior failed
 
     # Perform upstream request (this is the single fetcher for the key)
+    start = time.perf_counter()
     try:
         client = _get_http_client()
         response = client.get(CSFLOAT_API_URL, params=filtered_params, headers=headers)
@@ -138,9 +174,34 @@ def fetch_csfloat_listings(params: dict) -> Tuple[List[ItemDTO], str]:
                     float_value=item.get("float_value"),
                 )
             )
+        duration_ms = int((time.perf_counter() - start) * 1000)
+        logger.info(
+            json.dumps(
+                {
+                    "event": "fetch_ok",
+                    "key": key_id,
+                    "status_code": response.status_code,
+                    "duration_ms": duration_ms,
+                    "items": len(items),
+                }
+            )
+        )
         with _cache_lock:
             _listings_cache[cache_key] = items
         return items, "MISS"
+    except Exception as e:
+        duration_ms = int((time.perf_counter() - start) * 1000)
+        logger.error(
+            json.dumps(
+                {
+                    "event": "fetch_error",
+                    "key": key_id,
+                    "error": str(e),
+                    "duration_ms": duration_ms,
+                }
+            )
+        )
+        raise
     finally:
         # Always release inflight waiters even on error
         with _cache_lock:
