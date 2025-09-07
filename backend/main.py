@@ -85,3 +85,12 @@ async def validation_exception_handler(_, exc: RequestValidationError):
             "details": exc.errors(),
         },
     )
+
+
+@app.get("/health", tags=["Health"])
+def health_check():
+    """
+    Health check endpoint for backend service.
+    Returns status 'ok' if service is running.
+    """
+    return {"status": "ok"}

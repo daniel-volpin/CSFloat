@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     # CSFloat API
     CSFLOAT_API_KEY: str | None = None
     CSFLOAT_API_URL: str = "https://csfloat.com/api/v1/listings"
-    CSFLOAT_ITEM_NAMES_URL: str = "https://api.csfloat.com/api/v1/item-names"
+    CSFLOAT_ITEM_NAMES_URL: str = "https://csfloat.com/api/v1/item-names"
 
     # HTTP client
     REQUEST_CONNECT_TIMEOUT: float = 3.05

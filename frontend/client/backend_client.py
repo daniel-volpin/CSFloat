@@ -150,7 +150,7 @@ class BackendClient:
         Fetch listings from backend API.
         """
         data = _request_json(
-            "GET", f"{self.base_url}/api/listings", params=params, error_cls=BackendApiError
+            "GET", f"{self.base_url}/listings", params=params, error_cls=BackendApiError
         )
         results = data.get("data")
         return results if isinstance(results, list) else []
@@ -181,6 +181,6 @@ class BackendClient:
             "max_items": max_items,
         }
         data = _request_json(
-            "POST", f"{self.base_url}/api/analyze", json=payload, error_cls=BackendApiError
+            "POST", f"{self.base_url}/analyze/", json=payload, error_cls=BackendApiError
         )
         return data.get("result") or data.get("answer") or "No answer returned."

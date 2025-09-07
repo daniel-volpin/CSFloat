@@ -23,7 +23,7 @@ class AnalyzeResponse(BaseModel):
     result: str
 
 
-@router.post("/analyze", response_model=AnalyzeResponse)
+@router.post("/", response_model=AnalyzeResponse)
 def analyze_listings(payload: AnalyzeRequest = Body(...)) -> AnalyzeResponse:
     try:
         result = llm_client.ask_about_listings(

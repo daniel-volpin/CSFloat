@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 API_BASE_URL: str = os.getenv("API_BASE_URL", "http://localhost:8000")
-LISTINGS_ENDPOINT: str = f"{API_BASE_URL}/api/listings"
+LISTINGS_ENDPOINT: str = f"{API_BASE_URL}/listings/"
 
 # UI settings
 APP_TITLE: str = "CSFloat Listings"
