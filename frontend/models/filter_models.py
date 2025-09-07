@@ -13,31 +13,33 @@ class FilterState(BaseModel):
     """
 
     # Basic
-    cursor: Optional[str] = None
-    limit: int = 10
-    sort_by: str = "best_deal"
-    category: str = "Any"
-    def_index: Optional[List[int]] = None
+    cursor: Optional[str] = Field(None, description="API cursor for pagination")
+    limit: int = Field(10, description="Maximum number of items to fetch")
+    sort_by: str = Field("best_deal", description="Sort order for listings")
+    category: str = Field("Any", description="Item category filter")
+    def_index: Optional[List[int]] = Field(None, description="Definition indices for items")
 
     # Float & Rarity
-    min_float: float = 0.0
-    max_float: float = 1.0
-    rarity_selections: List[str] = Field(default_factory=list)
+    min_float: float = Field(0.0, description="Minimum float value for item filter")
+    max_float: float = Field(1.0, description="Maximum float value for item filter")
+    rarity_selections: List[str] = Field(
+        default_factory=list, description="Selected rarities for filter"
+    )
 
     # Item details
-    paint_seed: Optional[List[int]] = None
-    paint_index: Optional[int] = None
-    user_id: Optional[str] = None
-    collection: Optional[str] = None
+    paint_seed: Optional[List[int]] = Field(None, description="Paint seed values for item filter")
+    paint_index: Optional[int] = Field(None, description="Paint index for item filter")
+    user_id: Optional[str] = Field(None, description="User ID for filtering items")
+    collection: Optional[str] = Field(None, description="Collection name for filtering items")
 
     # Misc
-    market_hash_name: Optional[str] = None
-    type: Optional[str] = None
-    stickers: Optional[str] = None
+    market_hash_name: Optional[str] = Field(None, description="Market hash name for manual search")
+    type: Optional[str] = Field(None, description="Type of listing (buy_now, auction, etc.)")
+    stickers: Optional[str] = Field(None, description="Sticker information for item filter")
 
     # Price (USD)
-    min_price: Optional[float] = None
-    max_price: Optional[float] = None
+    min_price: Optional[float] = Field(None, description="Minimum price in USD")
+    max_price: Optional[float] = Field(None, description="Maximum price in USD")
 
     def to_params(
         self, *, category_map: Dict[str, int], rarity_map: Dict[str, int | None]
