@@ -18,6 +18,10 @@ Discover and filter CS:GO/CS2 item listings with a Streamlit UI and a FastAPI ba
 - [Features](#features)
 - [Getting Started](#getting-started)
 - [Running](#running)
+- [Testing](#testing)
+- [Configuration](#configuration)
+- [Project Structure](#project-structure)
+- [Development](#development)
 - [API](#api-reference)
 - [Troubleshooting](#troubleshooting)
 
@@ -33,23 +37,31 @@ Two-tier app: Streamlit frontend calls a small FastAPI service that standardizes
 
 ## Getting Started
 
-Single conda env for both backend and frontend.
+Quick, minimal setup (Python 3.11):
+
+Prerequisites:
+
+- Python 3.11 and pip
+- Optional: Conda (for managing the env)
+- Optional: GNU Make (for convenience targets)
 
 ```bash
-# Create env
-conda create -n csfloat python=3.11 -y
-conda activate csfloat
+# Create and activate env (conda example)
+conda create -n csfloat python=3.11 -y && conda activate csfloat
 
-# Install deps
-pip install -r backend/requirements.txt
-pip install -r frontend/requirements.txt
+# Install runtime deps (backend + frontend)
+make install
 
-# Backend env (backend/.env)
-printf "CSFLOAT_API_KEY=your_csfloat_key\nOPENAI_API_KEY=your_openai_key\n" > backend/.env
-# Optional demo: echo "USE_DUMMY_DATA=true" >> backend/.env
+# Optional: dev/test tooling
+make dev-install
 
-# Frontend env (frontend/.env)
-printf "API_BASE_URL=http://localhost:8000\n" > frontend/.env
+# No make? Use pip instead
+pip install -r backend/requirements.txt -r frontend/requirements.txt
+pip install -r requirements-dev.txt && pre-commit install
+
+# Configure env files (copy examples and edit as needed)
+cp backend/.env.example backend/.env   # set CSFLOAT/OPENAI keys
+cp frontend/.env.example frontend/.env # API_BASE_URL defaults to http://localhost:8000
 ```
 
 ## Running
@@ -59,18 +71,56 @@ Open two terminals (env: `csfloat`):
 - Backend: `uvicorn backend.main:app --reload` (docs: <http://localhost:8000/docs>)
 - Frontend: `cd frontend && streamlit run app.py`
 
-## Development
+Non-dev CORS configuration:
 
-Set up dev tooling and git hooks (Black, Ruff, Isort, Autoflake, Flake8, Mypy) using the Makefile:
+- In staging/production, restrict CORS via `backend/.env`:
+
+  - `CORS_ALLOW_ORIGINS=http://localhost:8501,https://yourdomain.com`
+  - `CORS_ALLOW_CREDENTIALS=true`
+
+  You can also use a JSON list:
+
+  - `CORS_ALLOW_ORIGINS=["http://localhost:8501", "https://yourdomain.com"]`
+
+  By default in dev, CORS is open (`*`).
+
+## Testing
+
+Run tests from the repo root (no external services required):
 
 ```bash
-make dev-install
+pytest -q
 ```
 
-Tips:
+CI runs lint, type-checks, and tests on every push/PR.
 
-- Update hooks to latest: `pre-commit autoupdate`
-- Run checks manually: `pre-commit run --all-files`
+## Configuration
+
+- backend/.env
+  - `CSFLOAT_API_KEY`: CSFloat API key (required for listings and item-names)
+  - `OPENAI_API_KEY`: OpenAI key (required only for AI analysis)
+  - `CORS_ALLOW_ORIGINS`: Comma-separated or JSON list of allowed origins (default `*`)
+  - `CORS_ALLOW_CREDENTIALS`: `true/false` for credentials (default `true`)
+- frontend/.env
+  - `API_BASE_URL`: Defaults to `http://localhost:8000`
+
+Note: AI analysis is optional. If `OPENAI_API_KEY` is not set, the rest of the app still works.
+
+## Project Structure
+
+```
+backend/   # FastAPI service (routes, services, config)
+frontend/  # Streamlit app (UI, client, models)
+tests/     # Pytest suite (unit + API)
+Makefile   # Common tasks (install, dev-install, run)
+requirements-dev.txt  # Dev/test tooling
+```
+
+## Development
+
+- Install dev tooling: `make dev-install`
+- Update hooks: `pre-commit autoupdate`
+- Run all checks locally: `pre-commit run --all-files`
 
 ## API Reference
 
@@ -79,12 +129,12 @@ Tips:
 - `GET /api/item-names` — returns `{ names: string[] }`
 - `POST /api/analyze` — `{ question, items, model?, max_items? } -> { result }`
 
-Errors use `{ error, message, details? }`. When `USE_DUMMY_DATA=false` and no real data source, listings/names return `503`.
+Errors use `{ error, message, details? }`. Upstream CSFloat or model provider failures are mapped to appropriate HTTP status codes (e.g., 503 for upstream unavailability, 401 for model auth issues).
 
 ## Troubleshooting
 
 - Cannot reach backend: verify it runs and `API_BASE_URL` is correct.
-- `503` on listings/names: start data source or set `USE_DUMMY_DATA=true`.
+- `503` on listings/names: the upstream CSFloat API may be unavailable or rate limited; verify your `CSFLOAT_API_KEY` and try again.
 - AI errors: ensure `OPENAI_API_KEY` is set (backend).
 
 [⬆️ Back to top](#csfloat--listings-explorer)
