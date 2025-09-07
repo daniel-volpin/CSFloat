@@ -19,10 +19,14 @@ with st.sidebar:
     nav_option = st.radio("Go to:", ["Home", "Analysis", "Settings"])
     st.markdown("---")
     st.markdown("#### Filters")
-    params = filter_sidebar()
-    params = {k: v for k, v in params.items() if v is not None}
-    if st.button("Apply Filters"):
-        st.session_state["filters_applied"] = True
+
+# Render filters form and collect submission outside to avoid double nesting
+params, filters_submitted = filter_sidebar()
+params = {k: v for k, v in params.items() if v is not None}
+if filters_submitted:
+    st.session_state["filters_applied"] = True
+
+with st.sidebar:
     st.markdown("---")
     st.caption(
         "Use the filters above to refine your search. Navigate between sections using the radio buttons."
