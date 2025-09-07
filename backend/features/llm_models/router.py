@@ -19,7 +19,7 @@ class LlmModelsResponse(BaseModel):
     models: List[LlmModelOption]
 
 
-@router.get("/llm/models", response_model=LlmModelsResponse)
+@router.get("/models", response_model=LlmModelsResponse)
 def list_llm_models():
     entries: List[LLMModelInfo] = list_models()
     options: List[LlmModelOption] = [
