@@ -3,14 +3,14 @@ from client.backend_client import ApiClientError, fetch_listings
 from components.listings.filter_sidebar import filter_sidebar
 from components.listings.listing_insights import listing_analysis
 from components.listings.listing_list import display_listings
-from components.ui.main_header import custom_header
+from components.ui.main_header import render_header
 from config.settings import APP_SUBTITLE, APP_TITLE
 from dotenv import load_dotenv
 
 load_dotenv()
 
 
-custom_header(APP_TITLE, subtitle=APP_SUBTITLE)
+render_header(APP_TITLE, subtitle=APP_SUBTITLE)
 
 # Modal dialog compatibility (uses st.dialog if available, else experimental)
 Dialog = getattr(st, "dialog", None) or getattr(st, "experimental_dialog", None)

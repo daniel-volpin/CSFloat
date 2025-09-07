@@ -10,7 +10,7 @@ ITEM_FIELDS = {
 }
 
 
-def display_item_card(item: ItemDTO):
+def render_item_card(item: ItemDTO):
     st.markdown("---")
     if item.price is not None:
         st.write(f"**{ITEM_FIELDS['price']}:** ${item.price / 100:.2f}")
