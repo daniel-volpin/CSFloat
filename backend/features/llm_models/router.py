@@ -20,9 +20,9 @@ class LlmModelsResponse(BaseModel):
 
 
 @router.get("/models", response_model=LlmModelsResponse)
-def list_llm_models():
+def list_llm_models() -> LlmModelsResponse:
     entries: List[LLMModelInfo] = list_models()
     options: List[LlmModelOption] = [
         LlmModelOption(label=e.display, value=f"{e.provider}:{e.key}") for e in entries
     ]
-    return {"models": options}
+    return LlmModelsResponse(models=options)
