@@ -12,8 +12,25 @@ load_dotenv()
 
 custom_header(APP_TITLE, subtitle=APP_SUBTITLE)
 
-# Top navigation as tabs for clarity
-tabs = st.tabs(["Home", "Analysis", "Settings"])
+# Modal dialog compatibility (uses st.dialog if available, else experimental)
+Dialog = getattr(st, "dialog", None) or getattr(st, "experimental_dialog", None)
+
+
+def open_analysis_modal(items):
+    """Open analysis UI in a modal if supported. Returns True if opened."""
+    if Dialog is None:
+        return False
+
+    @Dialog("Analyze Listings")
+    def _analysis_dialog():
+        listing_analysis(items)
+
+    _analysis_dialog()
+    return True
+
+
+# Top navigation as tabs for clarity (Analysis via modal only)
+tabs = st.tabs(["Home", "Settings"])
 
 # Sidebar filters
 with st.sidebar:
@@ -50,15 +67,28 @@ with tabs[0]:
         # Use last loaded items if present to avoid empty state on first render
         items = st.session_state.get("last_items", [])
 
+    # Top Analyze action
+    top_spacer, top_action_col = st.columns([6, 1])
+    with top_action_col:
+        if st.button("💬 Analyze", key="analysis_quick_top"):
+            opened = open_analysis_modal(items)
+            if not opened:
+                st.session_state["analysis_fallback_open"] = True
+                st.session_state["analysis_fallback_pos"] = "top"
+
+    # Fallback inline expander at top if dialog is not available
+    if (
+        st.session_state.get("analysis_fallback_open")
+        and st.session_state.get("analysis_fallback_pos") == "top"
+    ):
+        with st.expander("💬 Quick Analysis", expanded=True):
+            listing_analysis(items)
+            if st.button("Close", key="analysis_fallback_close_top"):
+                st.session_state["analysis_fallback_open"] = False
+
+    # Listings
     display_listings(items, error_message)
 
 with tabs[1]:
-    st.markdown("---")
-    items_for_analysis = st.session_state.get("last_items", [])
-    if not items_for_analysis:
-        st.info("No listings loaded yet. Use Home filters and apply.")
-    listing_analysis(items_for_analysis)
-
-with tabs[2]:
     st.markdown("---")
     st.info("Settings and configuration options will appear here.")
