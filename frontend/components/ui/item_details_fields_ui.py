@@ -1,7 +1,7 @@
 from typing import List, Optional, Tuple
 
 import streamlit as st
-from components.ui.filter_utils import WIDGET_KEY_PREFIX, parse_csv_ints
+from components.ui.item_filter_utils import WIDGET_KEY_PREFIX, parse_csv_ints
 
 
 def render_item_details() -> (

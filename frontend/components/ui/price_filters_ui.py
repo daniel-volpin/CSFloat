@@ -1,7 +1,7 @@
 from typing import Optional, Tuple
 
 import streamlit as st
-from components.ui.filter_utils import WIDGET_KEY_PREFIX
+from components.ui.item_filter_utils import WIDGET_KEY_PREFIX
 
 
 def render_price_filters() -> Tuple[Optional[float], Optional[float]]:

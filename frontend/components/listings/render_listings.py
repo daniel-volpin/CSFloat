@@ -2,7 +2,7 @@ from typing import Optional
 
 import streamlit as st
 from client.backend_client import ApiClientError, fetch_listings
-from components.ui.item_card import render_item_card
+from components.ui.item_card_display_ui import render_item_card
 
 
 @st.cache_data

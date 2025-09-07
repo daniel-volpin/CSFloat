@@ -3,11 +3,11 @@ from __future__ import annotations
 from typing import Dict, Tuple
 
 import streamlit as st
-from components.ui.basic_filters import render_basic_filters
-from components.ui.float_and_rarity import render_float_and_rarity
-from components.ui.item_details import render_item_details
-from components.ui.misc_fields import render_misc_fields
-from components.ui.price_filters import render_price_filters
+from components.ui.item_details_fields_ui import render_item_details
+from components.ui.item_float_rarity_filters_ui import render_float_and_rarity
+from components.ui.item_list_basic_filters_ui import render_basic_filters
+from components.ui.item_misc_fields_ui import render_misc_fields
+from components.ui.price_filters_ui import render_price_filters
 from config.settings import CATEGORY_MAP, RARITY_MAP
 from models.filter_models import FilterState
 

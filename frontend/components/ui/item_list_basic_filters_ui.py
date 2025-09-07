@@ -1,7 +1,7 @@
 from typing import List, Optional, Tuple
 
 import streamlit as st
-from components.ui.filter_utils import WIDGET_KEY_PREFIX, parse_csv_ints
+from components.ui.item_filter_utils import WIDGET_KEY_PREFIX, parse_csv_ints
 from config.settings import CATEGORY_OPTIONS, DEFAULT_LIMIT, DEFAULT_SORT_INDEX, SORT_OPTIONS
 
 

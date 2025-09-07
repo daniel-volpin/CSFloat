@@ -1,7 +1,7 @@
 from typing import List, Tuple
 
 import streamlit as st
-from components.ui.filter_utils import WIDGET_KEY_PREFIX
+from components.ui.item_filter_utils import WIDGET_KEY_PREFIX
 from config.settings import DEFAULT_FLOAT_RANGE, RARITY_OPTIONS
 
 

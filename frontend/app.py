@@ -1,6 +1,6 @@
 import streamlit as st
 from components.listings.render_filter_sidebar import filter_sidebar
-from components.ui.main_header import render_header
+from components.ui.app_main_header_ui import render_header
 from config.settings import APP_SUBTITLE, APP_TITLE
 from dotenv import load_dotenv
 from pages.home import render_home_tab
