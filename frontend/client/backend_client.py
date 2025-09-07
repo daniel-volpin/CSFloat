@@ -35,8 +35,6 @@ class ApiClientError(Exception):
 class BackendApiError(ApiClientError):
     """Exception for backend API errors."""
 
-    pass
-
 
 def _map_http_error(status: int, payload: Dict[str, Any] | None) -> ApiClientError:
     """
