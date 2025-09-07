@@ -12,15 +12,8 @@ load_dotenv()
 
 custom_header(APP_TITLE, subtitle=APP_SUBTITLE)
 
-# Top navigation links
-nav_cols = st.columns([1, 1, 1])
-with nav_cols[0]:
-    st.page_link("app.py", label="Home")
-with nav_cols[1]:
-    st.page_link("pages/1_Analysis.py", label="Analysis")
-with nav_cols[2]:
-    st.page_link("pages/2_Settings.py", label="Settings")
-st.markdown("---")
+# Top navigation as tabs for clarity
+tabs = st.tabs(["Home", "Analysis", "Settings"])
 
 # Sidebar filters
 with st.sidebar:
@@ -34,43 +27,38 @@ if filters_submitted:
 
 with st.sidebar:
     st.markdown("---")
-    st.caption("Use the filters above to refine your search. Navigate using the links at the top.")
+    st.caption("Use the filters above to refine your search.")
 
-
-# Main layout container - Home page content
-with st.container():
-    st.markdown("## Home")
+with tabs[0]:
     st.markdown("---")
+    items = []
+    error_message = None
+    # Fetch listings only when filters are applied
+    if st.session_state.get("filters_applied", False):
+        with st.spinner("Loading listings..."):
+            try:
+                items = fetch_listings(params)
+            except ApiClientError as e:
+                error_message = e.user_message
+            except Exception:
+                error_message = "Unable to connect to backend service. Please ensure the backend server is running and reachable."
+        # Store latest items for other tabs
+        st.session_state["last_items"] = items
+        # Reset flag so next filter change triggers a new fetch
+        st.session_state["filters_applied"] = False
+    else:
+        # Use last loaded items if present to avoid empty state on first render
+        items = st.session_state.get("last_items", [])
 
-    left, right = st.columns([2, 1])
+    display_listings(items, error_message)
 
-    # Listings display (left)
-    with left:
-        items = []
-        error_message = None
-        # Only fetch listings if filters_applied is set
-        if st.session_state.get("filters_applied", False):
-            with st.spinner("Loading listings..."):
-                try:
-                    items = fetch_listings(params)
-                except ApiClientError as e:
-                    error_message = e.user_message
-                except Exception:
-                    error_message = "Unable to connect to backend service. Please ensure the backend server is running and reachable."
-            # Debug output removed to keep UI clean
-            # Store latest items for other pages (e.g., Analysis)
-            st.session_state["last_items"] = items
-            # Reset flag so next filter change triggers a new fetch
-            st.session_state["filters_applied"] = False
-        else:
-            # Use last loaded items if present to avoid empty state on first render
-            items = st.session_state.get("last_items", [])
-
-        display_listings(items, error_message)
-
-    st.markdown("")
+with tabs[1]:
     st.markdown("---")
+    items_for_analysis = st.session_state.get("last_items", [])
+    if not items_for_analysis:
+        st.info("No listings loaded yet. Use Home filters and apply.")
+    listing_analysis(items_for_analysis)
 
-    # Listing analysis section (right)
-    with right:
-        listing_analysis(items)
+with tabs[2]:
+    st.markdown("---")
+    st.info("Settings and configuration options will appear here.")

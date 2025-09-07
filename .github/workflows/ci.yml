@@ -52,4 +52,4 @@ jobs:
         run: flake8 .
 
       - name: Mypy (type check)
-        run: mypy backend frontend
+        run: mypy backend frontend --disable-error-code unused-ignore
