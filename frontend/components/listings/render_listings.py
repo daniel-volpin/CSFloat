@@ -57,21 +57,25 @@ def render_listings(
                 st.markdown(
                     f"""
                     <div style='background:#23272f;padding:24px 24px 28px 24px;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,0.08);margin-bottom:22px; border: 2px solid #3b82f6; min-width: 280px; min-height: 120px; color: #f3f4f6;'>
-                        <span style='font-size:1.4em;font-weight:bold;display:flex;align-items:center;margin-bottom:6px;'>💲 ${item.price:.2f}</span>
-                        <span style='font-size:1.18em;font-weight:bold;margin-bottom:14px;'>📝 {item.name}</span>
-                        <div style='width:100%;margin-bottom:10px;'>
-                            <div style='display:flex;align-items:center;margin-bottom:8px;'>
-                                <span style='font-size:1.05em;margin-right:8px;'>🧢 <b>Wear:</b></span>
-                                <span style='font-size:1.05em;'>{item.wear}</span>
-                            </div>
-                            <div style='display:flex;align-items:center;margin-bottom:8px;'>
-                                <span style='font-size:1.05em;margin-right:8px;'>🎖️ <b>Rarity:</b></span>
-                                <span style='font-size:1.05em;'>{item.rarity}</span>
-                            </div>
-                            <div style='display:flex;align-items:center;'>
-                                <span style='font-size:1.05em;margin-right:8px;'>🌊 <b>Float:</b></span>
-                                <span style='font-size:1.05em;'>{float_display}</span>
-                            </div>
+                        <div style='display:flex;align-items:center;margin-bottom:10px;'>
+                            <span style='font-size:1.08em;font-weight:500;min-width:70px;'>Price:</span>
+                            <span style='font-size:1.3em;font-weight:700;color:#4ADE80;margin-left:10px;'>${item.price:.2f}</span>
+                        </div>
+                        <div style='display:flex;align-items:center;margin-bottom:10px;'>
+                            <span style='font-size:1.08em;font-weight:500;min-width:70px;'>Name:</span>
+                            <span style='font-size:1.18em;font-weight:700;margin-left:10px;'>{item.name}</span>
+                        </div>
+                        <div style='display:flex;align-items:center;margin-bottom:10px;'>
+                            <span style='font-size:1.08em;font-weight:500;min-width:70px;'>Wear:</span>
+                            <span style='font-size:1.08em;font-weight:600;margin-left:10px;'>{item.wear}</span>
+                        </div>
+                        <div style='display:flex;align-items:center;margin-bottom:10px;'>
+                            <span style='font-size:1.08em;font-weight:500;min-width:70px;'>Rarity:</span>
+                            <span style='font-size:1.08em;font-weight:600;margin-left:10px;'>{item.rarity}</span>
+                        </div>
+                        <div style='display:flex;align-items:center;'>
+                            <span style='font-size:1.08em;font-weight:500;min-width:70px;'>Float:</span>
+                            <span style='font-size:1.08em;font-weight:600;margin-left:10px;'>{float_display}</span>
                         </div>
                         <div style='margin-top:18px;width:100%;display:flex;justify-content:flex-start;'>
                             <button style='background:#3b82f6;color:#fff;border:none;padding:12px 28px;border-radius:8px;font-size:1.08em;cursor:pointer;'>View Details</button>
