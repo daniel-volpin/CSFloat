@@ -12,12 +12,18 @@ load_dotenv()
 
 custom_header(APP_TITLE, subtitle=APP_SUBTITLE)
 
+# Top navigation links
+nav_cols = st.columns([1, 1, 1])
+with nav_cols[0]:
+    st.page_link("app.py", label="Home")
+with nav_cols[1]:
+    st.page_link("pages/1_Analysis.py", label="Analysis")
+with nav_cols[2]:
+    st.page_link("pages/2_Settings.py", label="Settings")
+st.markdown("---")
 
-# Sidebar navigation and filters
+# Sidebar filters
 with st.sidebar:
-    st.title("CSFloat Navigation")
-    nav_option = st.radio("Go to:", ["Home", "Analysis", "Settings"])
-    st.markdown("---")
     st.markdown("#### Filters")
 
 # Render filters form and collect submission outside to avoid double nesting
@@ -28,49 +34,43 @@ if filters_submitted:
 
 with st.sidebar:
     st.markdown("---")
-    st.caption(
-        "Use the filters above to refine your search. Navigate between sections using the radio buttons."
-    )
+    st.caption("Use the filters above to refine your search. Navigate using the links at the top.")
 
 
-# Main layout container
+# Main layout container - Home page content
 with st.container():
-    st.markdown(f"## {nav_option} Section")
+    st.markdown("## Home")
     st.markdown("---")
 
-    if nav_option == "Home":
-        left, right = st.columns([2, 1])
+    left, right = st.columns([2, 1])
 
-        # Listings display (left)
-        with left:
-            items = []
-            error_message = None
-            # Only fetch listings if filters_applied is set or not present (initial load)
-            if st.session_state.get("filters_applied", False):
-                with st.spinner("Loading listings..."):
-                    try:
-                        items = fetch_listings(params)
-                    except ApiClientError as e:
-                        error_message = e.user_message
-                    except Exception:
-                        error_message = "Unable to connect to backend service. Please ensure the backend server is running and reachable."
-                # Debug: print prices of returned listings
-                st.sidebar.write("Returned listing prices:", [item.price for item in items])
-                # Reset flag so next filter change triggers a new fetch
-                st.session_state["filters_applied"] = False
-            display_listings(items, error_message)
+    # Listings display (left)
+    with left:
+        items = []
+        error_message = None
+        # Only fetch listings if filters_applied is set
+        if st.session_state.get("filters_applied", False):
+            with st.spinner("Loading listings..."):
+                try:
+                    items = fetch_listings(params)
+                except ApiClientError as e:
+                    error_message = e.user_message
+                except Exception:
+                    error_message = "Unable to connect to backend service. Please ensure the backend server is running and reachable."
+            # Debug output removed to keep UI clean
+            # Store latest items for other pages (e.g., Analysis)
+            st.session_state["last_items"] = items
+            # Reset flag so next filter change triggers a new fetch
+            st.session_state["filters_applied"] = False
+        else:
+            # Use last loaded items if present to avoid empty state on first render
+            items = st.session_state.get("last_items", [])
 
-        st.markdown("")
-        st.markdown("---")
+        display_listings(items, error_message)
 
-        # Listing analysis section (right)
-        with right:
-            listing_analysis(items)
+    st.markdown("")
+    st.markdown("---")
 
-    elif nav_option == "Analysis":
-        st.markdown("### Analysis")
-        st.info("Analysis tools and visualizations will appear here.")
-
-    elif nav_option == "Settings":
-        st.markdown("### Settings")
-        st.info("Settings and configuration options will appear here.")
+    # Listing analysis section (right)
+    with right:
+        listing_analysis(items)
