@@ -1,6 +1,6 @@
 import streamlit as st
 from client.csfloat_api import ApiClientError, fetch_listings
-from components.listings.listing_filters import filter_sidebar
+from components.listings.filter_sidebar import filter_sidebar
 from components.listings.listing_insights import listing_analysis
 from components.listings.listing_list import display_listings
 from components.ui.main_header import custom_header

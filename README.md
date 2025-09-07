@@ -86,5 +86,5 @@ Errors use `{ error, message, details? }`. When `USE_DUMMY_DATA=false` and no re
 - Cannot reach backend: verify it runs and `API_BASE_URL` is correct.
 - `503` on listings/names: start data source or set `USE_DUMMY_DATA=true`.
 - AI errors: ensure `OPENAI_API_KEY` is set (backend).
+
 [⬆️ Back to top](#csfloat--listings-explorer)
-[⬆️ Back to top](#readme-top)

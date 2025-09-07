@@ -1,0 +1,70 @@
+import streamlit as st
+from client.csfloat_api import fetch_item_names
+from config.settings import (
+    CATEGORY_MAP,
+    CATEGORY_OPTIONS,
+    DEFAULT_FLOAT_RANGE,
+    DEFAULT_LIMIT,
+    RARITY_OPTIONS,
+    SORT_OPTIONS,
+)
+
+
+def filter_sidebar():
+    st.sidebar.header("Filter Listings")
+    with st.sidebar.expander("Basic Filters", expanded=True):
+        cursor = st.text_input("Cursor", "")
+        limit = st.slider("Limit", 1, 50, DEFAULT_LIMIT)
+        sort_by = st.selectbox("Sort By", SORT_OPTIONS, index=6)
+        category = st.selectbox("Category", CATEGORY_OPTIONS, index=0)
+        def_index = st.text_input("Def Index (comma separated)", "")
+    with st.sidebar.expander("Float & Rarity", expanded=False):
+        min_float, max_float = st.slider("Float Range", 0.0, 1.0, DEFAULT_FLOAT_RANGE, step=0.01)
+        rarity = st.multiselect("Rarity", RARITY_OPTIONS)
+    with st.sidebar.expander("Item Details", expanded=False):
+        paint_seed_input = st.text_input("Paint Seed (comma separated)", "")
+        paint_seeds = (
+            [int(x.strip()) for x in paint_seed_input.split(",") if x.strip().isdigit()]
+            if paint_seed_input
+            else None
+        )
+        paint_index = st.text_input("Paint Index", "")
+        user_id = st.text_input("User ID", "")
+        collection = st.text_input("Collection", "")
+
+        @st.cache_data(show_spinner=False, ttl=60)
+        def get_item_names():
+            return fetch_item_names(limit=50)
+
+        item_names = get_item_names()
+        item_name = st.selectbox("Item Name", ["Any"] + item_names, index=0)
+    market_hash_name = st.text_input("Market Hash Name (manual search)", "")
+    type_ = st.selectbox("Type", ["", "buy_now", "auction"], index=0)
+    stickers = st.text_input("Stickers", "")
+    with st.sidebar.expander("Price Filter", expanded=True):
+        col1, col2 = st.columns(2)
+        min_price_dollars = col1.number_input("Min Price ($)", min_value=0.0, value=0.0, step=0.01)
+        max_price_dollars = col2.number_input("Max Price ($)", min_value=0.0, value=0.0, step=0.01)
+    params = {
+        "cursor": cursor or None,
+        "limit": limit,
+        "sort_by": sort_by,
+        "category": CATEGORY_MAP[category],
+        "def_index": (
+            [int(x) for x in def_index.split(",") if x.strip().isdigit()] if def_index else None
+        ),
+        "min_float": min_float,
+        "max_float": max_float,
+        "rarity": ",".join(rarity) if rarity else None,
+        "paint_seed": paint_seeds if paint_seeds else None,
+        "paint_index": int(paint_index) if paint_index else None,
+        "user_id": user_id if user_id else None,
+        "collection": collection if collection else None,
+        "item_name": item_name if item_name != "Any" else None,
+        "market_hash_name": market_hash_name if market_hash_name else None,
+        "type": type_ if type_ else None,
+        "stickers": stickers if stickers else None,
+        "min_price": min_price_dollars,
+        "max_price": max_price_dollars,
+    }
+    return params
