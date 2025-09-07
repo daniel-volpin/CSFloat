@@ -22,9 +22,12 @@ def main() -> None:
         st.session_state["filters"] = {}
     if "filters_applied" not in st.session_state:
         st.session_state["filters_applied"] = False
+
+    # Only update filters if user submits the form
     if filters_submitted:
         st.session_state["filters"] = params
         st.session_state["filters_applied"] = True
+        st.rerun()
 
     # Reset Filters button
     if st.button("Reset Filters", key="reset_filters"):
@@ -34,15 +37,21 @@ def main() -> None:
 
     active_params = st.session_state["filters"] if st.session_state["filters_applied"] else {}
     st.markdown("")
+
+    @st.cache_data(show_spinner=False)
+    def cached_fetch_and_store_listings(params):
+        return fetch_and_store_listings(params)
+
     items = None
     error_message = None
+    if st.session_state["filters_applied"]:
+        with st.spinner("Loading listings..."):
+            items, error_message = cached_fetch_and_store_listings(active_params)
 
     col1, col2 = st.columns([1.2, 1.8], gap="large")
     with col1:
         st.markdown("<h2 style='margin-bottom:0.5em;'>Listings</h2>", unsafe_allow_html=True)
-        if st.session_state["filters_applied"]:
-            with st.spinner("Loading listings..."):
-                items, error_message = fetch_and_store_listings(active_params)
+        if items:
             render_listings(items, error_message)
         else:
             st.info("Apply filters to see listings.")
@@ -52,12 +61,10 @@ def main() -> None:
         )
         # Only show analysis if listings are loaded
         if items:
-            with st.expander("Show Analysis", expanded=True):
-                st.markdown("Analyze the currently loaded listings using AI.")
-                render_listing_analysis(items)
+            st.markdown("Analyze the currently loaded listings using AI.")
+            render_listing_analysis(items)
         else:
-            with st.expander("Show Analysis", expanded=False):
-                st.info("Apply filters and load listings to enable analysis.")
+            st.info("Apply filters and load listings to enable analysis.")
 
 
 if __name__ == "__main__":
