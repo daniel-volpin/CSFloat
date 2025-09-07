@@ -25,7 +25,7 @@ try:
 
     router.include_router(cache_router)
 
-    from .models import router as models_router
+    from .llm_models import router as models_router
 
     router.include_router(models_router)
 except Exception:  # pragma: no cover
