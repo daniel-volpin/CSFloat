@@ -29,27 +29,25 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r backend/requirements.txt -r frontend/requirements.txt
           pip install black==24.4.2 isort==5.13.2 flake8==7.0.0 mypy==1.11.1 types-requests ruff==0.6.2 autoflake==2.3.1
+          pip install pytest==8.3.2 respx==0.21.1 pytest-cov==5.0.0
 
-      - name: Autoflake (remove unused imports/vars)
-        run: autoflake --in-place --remove-all-unused-imports --remove-unused-variables --expand-star-imports -r .
+      - name: Autoflake (check)
+        run: autoflake --check --remove-all-unused-imports --remove-unused-variables --expand-star-imports -r .
 
-      - name: Ruff (auto-fix lint)
-        run: ruff check --fix .
+      - name: Ruff (lint)
+        run: ruff check .
 
-      - name: isort (apply)
-        run: isort .
+      - name: isort (check)
+        run: isort --check-only .
 
-      - name: black (apply)
-        run: black .
-
-      - name: Auto-commit formatting changes
-        if: github.event_name == 'push'
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: 'ci: auto-fix (autoflake, ruff) and auto-format (isort, black)'
+      - name: black (check)
+        run: black --check .
 
       - name: Flake8 (lint)
         run: flake8 .
 
       - name: Mypy (type check)
         run: mypy backend frontend --disable-error-code unused-ignore
+
+      - name: Run tests
+        run: pytest -q --maxfail=1

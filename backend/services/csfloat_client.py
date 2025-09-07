@@ -232,9 +232,17 @@ def invalidate_cache():
 
 
 def fetch_csfloat_item_names(limit: int = 50) -> List[str]:
-    url = os.getenv("CSFLOAT_API_ITEM_NAMES_URL", _settings.CSFLOAT_ITEM_NAMES_URL)
+    """Fetch item names from CSFloat item-names endpoint.
+
+    Uses the configured `CSFLOAT_ITEM_NAMES_URL` from settings. Authorization
+    header is included if `CSFLOAT_API_KEY` is configured.
+    """
+    url = _settings.CSFLOAT_ITEM_NAMES_URL
+    headers = {"Authorization": CSFLOAT_API_KEY} if CSFLOAT_API_KEY else {}
     client = _get_http_client()
-    response = client.get(url, params={"limit": limit})
+    response = client.get(url, params={"limit": limit}, headers=headers)
     response.raise_for_status()
     data = response.json()
-    return data.get("names", [])
+    # API returns { names: [...] }
+    names = data.get("names", [])
+    return names if isinstance(names, list) else []

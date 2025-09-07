@@ -46,7 +46,6 @@ pip install -r frontend/requirements.txt
 
 # Backend env (backend/.env)
 printf "CSFLOAT_API_KEY=your_csfloat_key\nOPENAI_API_KEY=your_openai_key\n" > backend/.env
-# Optional demo: echo "USE_DUMMY_DATA=true" >> backend/.env
 
 # Frontend env (frontend/.env)
 printf "API_BASE_URL=http://localhost:8000\n" > frontend/.env
@@ -58,6 +57,19 @@ Open two terminals (env: `csfloat`):
 
 - Backend: `uvicorn backend.main:app --reload` (docs: <http://localhost:8000/docs>)
 - Frontend: `cd frontend && streamlit run app.py`
+
+Non-dev CORS configuration:
+
+- In staging/production, restrict CORS via `backend/.env`:
+
+  - `CORS_ALLOW_ORIGINS=http://localhost:8501,https://yourdomain.com`
+  - `CORS_ALLOW_CREDENTIALS=true`
+
+  You can also use a JSON list:
+
+  - `CORS_ALLOW_ORIGINS=["http://localhost:8501", "https://yourdomain.com"]`
+
+  By default in dev, CORS is open (`*`).
 
 ## Development
 
@@ -79,12 +91,12 @@ Tips:
 - `GET /api/item-names` — returns `{ names: string[] }`
 - `POST /api/analyze` — `{ question, items, model?, max_items? } -> { result }`
 
-Errors use `{ error, message, details? }`. When `USE_DUMMY_DATA=false` and no real data source, listings/names return `503`.
+Errors use `{ error, message, details? }`. Upstream CSFloat or model provider failures are mapped to appropriate HTTP status codes (e.g., 503 for upstream unavailability, 401 for model auth issues).
 
 ## Troubleshooting
 
 - Cannot reach backend: verify it runs and `API_BASE_URL` is correct.
-- `503` on listings/names: start data source or set `USE_DUMMY_DATA=true`.
+- `503` on listings/names: the upstream CSFloat API may be unavailable or rate limited; verify your `CSFLOAT_API_KEY` and try again.
 - AI errors: ensure `OPENAI_API_KEY` is set (backend).
 
 [⬆️ Back to top](#csfloat--listings-explorer)

@@ -19,6 +19,10 @@ try:
 
     router.include_router(listings_router)
 
+    from .item_names import router as item_names_router
+
+    router.include_router(item_names_router)
+
     from .cache import router as cache_router
 
     router.include_router(cache_router)
