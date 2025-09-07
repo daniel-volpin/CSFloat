@@ -2,7 +2,8 @@ from typing import List
 
 from fastapi import APIRouter
 from pydantic import BaseModel
-from services.llm.registry import LLMModelInfo, list_models
+
+from ...services.llm.registry import LLMModelInfo, list_models
 
 router = APIRouter()
 

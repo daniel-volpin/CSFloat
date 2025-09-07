@@ -1,10 +1,11 @@
 from typing import List, Optional
 
 from fastapi import APIRouter, Body, HTTPException
-from models.models import ItemDTO
 from openai import AuthenticationError
 from pydantic import BaseModel
-from services.llm.client import LLMClient
+
+from ...models.models import ItemDTO
+from ...services.llm.client import LLMClient
 
 router = APIRouter()
 llm_client = LLMClient()

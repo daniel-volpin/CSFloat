@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
-from services.csfloat.client import CSFloatClient
+
+from ...services.csfloat.client import CSFloatClient
 
 
 class ItemNamesResponse(BaseModel):
