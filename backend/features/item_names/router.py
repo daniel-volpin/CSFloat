@@ -12,7 +12,7 @@ router = APIRouter()
 csfloat_client = CSFloatClient()
 
 
-@router.get("/item-names", response_model=ItemNamesResponse)
+@router.get("/", response_model=ItemNamesResponse)
 def get_item_names(limit: int = Query(50, ge=1, le=500)):
     try:
         names = csfloat_client.fetch_item_names(limit=limit)

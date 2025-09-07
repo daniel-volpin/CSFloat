@@ -13,12 +13,10 @@ class ListingsResponse(BaseModel):
 
 
 router = APIRouter()
-router = APIRouter()
-csfloat_client = CSFloatClient()
 csfloat_client = CSFloatClient()
 
 
-@router.get("/listings", response_model=ListingsResponse)
+@router.get("/", response_model=ListingsResponse)
 def get_listings(
     limit: int = Query(10, ge=1, le=50),
     sort_by: str = Query("best_deal"),
