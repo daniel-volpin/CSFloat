@@ -3,11 +3,12 @@ from typing import List, Optional
 from fastapi import APIRouter, Body, HTTPException
 from openai import AuthenticationError
 from pydantic import BaseModel
+from services.llm.client import LLMClient
 
 from ..models.models import ItemDTO
-from ..services.llm_client import ask_about_listings
 
 router = APIRouter()
+llm_client = LLMClient()
 
 
 class AnalyzeRequest(BaseModel):
@@ -24,7 +25,7 @@ class AnalyzeResponse(BaseModel):
 @router.post("/analyze", response_model=AnalyzeResponse)
 def analyze_listings(payload: AnalyzeRequest = Body(...)):
     try:
-        result = ask_about_listings(
+        result = llm_client.ask_about_listings(
             payload.question, payload.items, payload.model, payload.max_items
         )
         return {"result": result}

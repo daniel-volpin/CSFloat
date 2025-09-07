@@ -10,6 +10,7 @@ from ...config.settings import get_settings
 
 
 class OpenAIClient:
+
     def __init__(self, api_key: Optional[str] = None, base_url: Optional[str] = None):
         settings = get_settings()
         self.api_key = api_key or settings.OPENAI_API_KEY or os.getenv("OPENAI_API_KEY")
@@ -33,11 +34,7 @@ class OpenAIClient:
             return None
 
     def chat(
-        self,
-        model: str,
-        messages: list,
-        temperature: float = 0.2,
-        max_tokens: int = 300,
+        self, model: str, messages: list, temperature: float = 0.2, max_tokens: int = 300
     ) -> str:
         resp = self.client.chat.completions.create(
             model=model,

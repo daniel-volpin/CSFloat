@@ -5,8 +5,9 @@ from typing import Any, Optional
 
 
 class LMStudioClient:
+
     def __init__(self, api_host: Optional[str] = None):
-        try:  # pragma: no cover - optional dependency
+        try:
             import lmstudio as _lms  # type: ignore
         except Exception:
             raise RuntimeError(

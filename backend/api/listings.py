@@ -2,9 +2,9 @@ from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
+from services.csfloat.client import CSFloatClient
 
 from ..models.models import ItemDTO
-from ..services.csfloat_client import fetch_csfloat_listings
 
 
 class ListingsResponse(BaseModel):
@@ -13,6 +13,7 @@ class ListingsResponse(BaseModel):
 
 
 router = APIRouter()
+csfloat_client = CSFloatClient()
 
 
 @router.get("/listings", response_model=ListingsResponse)
@@ -57,7 +58,7 @@ def get_listings(
             "type": type,
             "stickers": stickers,
         }
-        items, cache_status = fetch_csfloat_listings(params)
+        items, cache_status = csfloat_client.fetch_listings(params)
         return {"data": items, "meta": {"cache": cache_status}}
     except Exception as e:
         raise HTTPException(status_code=503, detail=f"Listings service unavailable: {str(e)}")

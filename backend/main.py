@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 
 from .api import router
 from .config.settings import get_settings
-from .services.csfloat_client import set_http_client
+from .services.csfloat.client import CSFloatClient
 
 
 @asynccontextmanager
@@ -17,7 +17,7 @@ async def lifespan(app: FastAPI):
     http2_enabled = bool(settings.HTTP2_ENABLED)
     try:
         if http2_enabled:
-            import h2  # type: ignore  # noqa: F401
+            pass
         else:
             http2_enabled = False
     except Exception:
@@ -36,7 +36,8 @@ async def lifespan(app: FastAPI):
             max_connections=int(settings.HTTPX_MAX_CONNECTIONS),
         ),
     )
-    set_http_client(client)
+    csfloat_client = CSFloatClient()
+    csfloat_client.set_http_client(client)
     try:
         yield
     finally:
