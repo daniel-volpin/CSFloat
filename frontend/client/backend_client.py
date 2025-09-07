@@ -1,14 +1,15 @@
 import time
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
-import requests
-from config.settings import ITEM_NAMES_ENDPOINT, LISTINGS_ENDPOINT
+import httpx
+from config.settings import API_BASE_URL, LISTINGS_ENDPOINT
 from models.listing_models import ItemDTO
 
-DEFAULT_TIMEOUT = (3.05, 10)
+_client = httpx.Client(
+    timeout=httpx.Timeout(connect=3.05, read=10.0, write=10.0, pool=3.0),
+)
 
 
-# Lightweight client-side error types with user-friendly messages
 class ApiClientError(Exception):
     def __init__(
         self,
@@ -23,10 +24,13 @@ class ApiClientError(Exception):
         self.detail = detail
 
 
+class BackendApiError(ApiClientError):
+    pass
+
+
 def _map_http_error(status: int, payload: Dict[str, Any] | None) -> ApiClientError:
     server_msg = None
     if isinstance(payload, dict):
-        # Backend returns {"error": ..., "message": ...}
         server_msg = payload.get("message") or payload.get("detail")
 
     messages = {
@@ -56,28 +60,34 @@ def _request_json(
     *,
     params: Dict[str, Any] | None = None,
     json: Any | None = None,
+    error_cls=ApiClientError,
 ) -> Dict[str, Any]:
     try:
-        resp = requests.request(method, url, params=params, json=json, timeout=DEFAULT_TIMEOUT)
-        # Attempt to parse JSON payload early for richer errors
+        resp = _client.request(method, url, params=params, json=json)
         payload: Dict[str, Any] | None = None
         try:
             payload = resp.json()
         except Exception:
             payload = None
 
-        if not resp.ok:
-            raise _map_http_error(resp.status_code, payload)
+        if not (200 <= resp.status_code < 300):
+            raise (error_cls if error_cls is not None else ApiClientError)(
+                (_map_http_error(resp.status_code, payload).user_message),
+                status_code=resp.status_code,
+                detail=str(payload),
+            )
 
         if not isinstance(payload, dict):
-            raise ApiClientError("Unexpected response format from server.")
+            raise error_cls("Unexpected response format from server.")
         return payload
-    except requests.Timeout:
-        raise ApiClientError("Request timed out. Please try again.")
-    except requests.ConnectionError:
-        raise ApiClientError("Cannot reach backend. Verify the server is running and reachable.")
-    except requests.RequestException as e:
-        raise ApiClientError("Network error occurred. Please try again.", detail=str(e))
+    except httpx.ConnectTimeout:
+        raise error_cls("Connection timed out. Please try again.")
+    except httpx.ReadTimeout:
+        raise error_cls("Request timed out. Please try again.")
+    except httpx.ConnectError:
+        raise error_cls("Cannot reach backend. Verify the server is running and reachable.")
+    except httpx.HTTPError as e:
+        raise error_cls("Network error occurred. Please try again.", detail=str(e))
 
 
 def _merge_item(entry: Dict[str, Any]) -> Dict[str, Any]:
@@ -90,7 +100,7 @@ def _merge_item(entry: Dict[str, Any]) -> Dict[str, Any]:
 
 def fetch_listings(params: Dict[str, Any]) -> List[ItemDTO]:
     start = time.time()
-    data = _request_json("GET", LISTINGS_ENDPOINT, params=params)
+    data = _request_json("GET", LISTINGS_ENDPOINT, params=params, error_cls=ApiClientError)
 
     items_raw = data.get("data")
     if not isinstance(items_raw, list):
@@ -99,20 +109,42 @@ def fetch_listings(params: Dict[str, Any]) -> List[ItemDTO]:
     listings = [ItemDTO.from_dict(_merge_item(e)) for e in items_raw if isinstance(e, dict)]
 
     elapsed = time.time() - start
-    if elapsed < 0.1:
+    meta = data.get("meta")
+    if isinstance(meta, dict) and meta.get("cache") == "HIT":
         print("[Cache] Using cached listings!")
     else:
         print(f"[Cache] Fetching listings from API... ({elapsed:.2f}s)")
     return listings
 
 
-def fetch_item_names(limit: int = 50) -> list[str]:
-    try:
-        data = _request_json("GET", ITEM_NAMES_ENDPOINT, params={"limit": limit})
-        names = data.get("names") if isinstance(data, dict) else None
-        if not isinstance(names, list):
-            return []
-        return [str(n) for n in names if isinstance(n, str) and n.strip()]
-    except ApiClientError:
-        # Silently degrade in the UI (filters can work without names)
-        return []
+class BackendClient:
+    """Client for backend analysis and listings."""
+
+    def __init__(self, base_url: Optional[str] = None):
+        self.base_url = base_url or API_BASE_URL
+
+    def fetch_listings(self, params: Dict[str, Any]) -> List[Dict[str, Any]]:
+        data = _request_json(
+            "GET", f"{self.base_url}/api/listings", params=params, error_cls=BackendApiError
+        )
+        results = data.get("data")
+        return results if isinstance(results, list) else []
+
+    def analyze_listings(
+        self,
+        question: str,
+        items: List[Any],
+        model: Optional[str] = None,
+        max_items: int = 50,
+    ) -> str:
+        serializable_items = [item.dict() if hasattr(item, "dict") else item for item in items]
+        payload = {
+            "question": question,
+            "items": serializable_items,
+            "model": model,
+            "max_items": max_items,
+        }
+        data = _request_json(
+            "POST", f"{self.base_url}/api/analyze", json=payload, error_cls=BackendApiError
+        )
+        return data.get("result") or data.get("answer") or "No answer returned."

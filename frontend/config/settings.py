@@ -7,7 +7,6 @@ load_dotenv()
 
 API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
 LISTINGS_ENDPOINT = f"{API_BASE_URL}/api/listings"
-ITEM_NAMES_ENDPOINT = f"{API_BASE_URL}/api/item-names"
 
 # UI settings
 APP_TITLE = "CSFloat Listings"
